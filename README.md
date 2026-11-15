@@ -4,9 +4,9 @@
   <img src="LCS_recomp2.png" alt="LCS Recomp — unofficial concept artwork" width="430">
 </p>
 
-<p align="center"><strong>Experimental PlayStation 2-to-Windows recompilation project</strong></p>
+<p align="center"><strong>Experimental PS2 to Windows recompilation project</strong></p>
 
-<p align="center">Windows (x64) · C++ · DirectX 11 · Work in progress</p>
+<p align="center">Windows (x64) DirectX 11 · Work in progress (other platforms are planned)</p> 
 
 
 
@@ -21,9 +21,19 @@ The aim is to make the game playable on PC while preserving the original experie
 
 This is an experimental project, **not a finished PC port or public game release**.
 
+## AI-assisted development
+
+Yes, AI is used extensively in this project - and I want to be transparent about that.
+
+I work with Claude and a locally running Qwen 27B model to accelerate research, code exploration, implementation, debugging, profiling, and testing. At my current skill level, rebuilding and integrating the systems needed to run a complex console game on Windows could take many months, potentially much longer, without those tools. AI makes it possible to move much faster from a hypothesis to a working change and a real test.
+
+Using AI does not mean the project builds itself or that technical knowledge is unnecessary. The work still requires understanding how the game and its original hardware behave: CPU execution and memory layouts, vector processors, synchronization, rendering commands, graphics pipelines, timing, controller inputs, audio, reverse engineering, and performance bottlenecks. It also requires recognizing incorrect assumptions, reading logs, reproducing bugs, comparing results, and preventing regressions.
+
+AI-generated code can be wrong, inefficient, or incompatible with existing systems. I decide what belongs in the codebase, what gets rewritten or rejected, what trade-offs are acceptable, and what the project should become. AI helps with the workload; engineering decisions, integration, validation, and responsibility remain mine.
+
 ## Current status
 
-**Playable internal build — active development.** The game has progressed well beyond a rendering demonstration:
+**Playable internal build - active development.** The game has progressed well beyond a rendering demonstration:
 
 - **Windows / DirectX 11:** The game starts and runs through the DX11 rendering path.
 - **Open world:** Exploration, driving and core gameplay interactions work in tested builds.
@@ -35,7 +45,7 @@ This is an experimental project, **not a finished PC port or public game release
 
 These are results from internal development. **Full-game compatibility, consistently high frame rates and correct behavior in every mission have not yet been verified.**
 
-### Recent progress — November 2026
+### Recent progress - November 2026
 
 - **Rendering:** Significant improvements to world and character rendering. In a documented test, 99.6% of the relevant character-rendering packets used an optimized native path.
 - **Verification:** 451,589 fast-path packets matched the reference execution in a dedicated verification run. This does not establish complete graphical accuracy across the game.
@@ -43,34 +53,63 @@ These are results from internal development. **Full-game compatibility, consiste
 - **Stuttering:** A logging-related bottleneck behind repeated driving hitches was addressed. The recurring hitches were no longer experienced in a subsequent long test, although isolated frame-time spikes remain.
 - **Timing and presentation:** Higher-frame-rate behavior, smooth frame pacing and variable-refresh-rate presentation still need more testing and refinement.
 
-## Classic and Enhanced experiences
+## Classic and Enhanced Experiences
 
-Two ways to play are planned. Features marked *planned* or *exploratory* are not commitments to a release date.
+The project aims to offer two ways to play. Players should be able to enjoy the original console experience or enable optional improvements designed for modern PCs.
 
-| Classic PS2 experience | Enhanced PC experience |
-| --- | --- |
-| Original **4:3** presentation — available | **1080p, 1440p and 4K** options — implemented |
-| Classic **30 FPS** mode — selectable | **30 / 60 / 120 / Uncapped** modes — selectable; higher frame-rate behavior is still being validated |
-| Original-style visuals, gameplay and camera — ongoing refinement | Optional visual improvements and greater draw distance — planned, subject to feasibility |
-| Traditional controller layout — being refined | Modern controller layouts — further support planned |
-| **Pressure-sensitive buttons** on compatible controllers — planned | Optional free-moving vehicle camera — planned |
-| Faithful game timing and handling — ongoing testing | Additional display, performance and customization settings — planned |
+### Classic PS2 Experience
 
-## Development roadmap
+The goal is to preserve the original gameplay and presentation as closely as possible.
 
-The roadmap reflects the state of the project, not a promised release schedule. A completed milestone means its **core objective** has been reached in internal builds, not that every related system is free of bugs.
+**Already available**
+- Original 4:3 aspect ratio
+- Classic 30 FPS mode
+- Functional controller input
 
-| Phase | Milestone | Status | Focus |
-| --- | --- | --- | --- |
-| **01** | Playable PC foundation | **Completed** | Windows execution, open-world gameplay, missions, saving and controller input |
-| **02** | Graphics and rendering | **Advanced** | Improve visual accuracy, characters, effects and demanding scenes |
-| **03** | Performance and stability | **In progress** | Smooth frame pacing, higher FPS, fewer stalls and crashes |
-| **04** | Game compatibility and polish | **In progress** | More missions, saves, audio, cutscenes and longer play sessions |
-| **05** | Classic PS2 experience | **Partially available** | Authentic presentation, controls and pressure-sensitive buttons |
-| **06** | Enhanced PC experience | **Partially implemented** | Higher resolutions, FPS options and optional modern features |
-| **07** | Modding and customization | **Exploratory** | Investigate mod loading, configuration and custom content support |
-| **08** | Possible closed beta | **Under consideration** | Collect bug reports and test across a broader range of PCs |
-| **09** | Public release preparation | **Future goal** | Clean builds, documentation, licensing and final compatibility review |
+**In development**
+- Accurate gameplay behavior and timing
+- Original camera behavior and vehicle handling
+- Improved visual accuracy
+- Traditional controller layout
+
+**Planned**
+- Pressure-sensitive button support for compatible controllers
+- Further improvements to the original console experience
+
+### Enhanced PC Experience
+
+The Enhanced experience focuses on flexibility, higher performance and modern PC features.
+
+**Already available**
+- Selectable 30, 60, 120 and Uncapped FPS modes
+- 1080p, 1440p and 4K resolution options
+- DirectX 11 rendering
+
+**In development**
+- Improved frame pacing and stability
+- High refresh rate optimization
+- More consistent performance at higher frame rates
+- Modern controller support
+
+**Planned**
+- Increased draw distance
+- Optional graphics enhancements
+- Modern controller layouts
+- Optional free vehicle camera similar to San Andreas
+- Additional display and graphics settings
+
+Some enhancements may require changes to the original game behavior. These will remain optional whenever technically possible.
+
+
+## Development Roadmap
+
+Development is ongoing. The following milestones show what has already been achieved and what is planned for future updates.
+
+
+
+
+Planned features may change depending on technical feasibility and development progress.
+
 
 ### What comes next
 
@@ -89,12 +128,6 @@ A **limited closed beta** may be considered later to gather bug reports and hard
 There is currently **no public game download or verified clean-checkout build guide**. Installation steps and prerequisites will be documented after the source tree and dependencies have been audited.
 
 This repository is not intended to distribute original game disc images, executables, audio, textures, models, movies, console firmware or other proprietary game files. Any generated or recompiled output must also be checked before redistribution.
-
-## AI-assisted development
-
-I use **Claude** and a locally running **Qwen 27B** model to help with research, code analysis, implementation and debugging. They make it possible to explore and test ideas much faster than I could working alone.
-
-That does not mean the project builds itself. Working on a PS2 recompilation project still requires understanding hardware behavior, memory, rendering, timing, input and how game systems interact. AI-generated suggestions can be wrong, so results have to be reviewed and tested. **I decide what goes into the project, what gets changed and what does not belong.**
 
 ## Credits
 
