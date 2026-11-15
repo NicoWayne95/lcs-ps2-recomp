@@ -43,70 +43,12 @@ AI-generated code can be wrong, inefficient, or incompatible with existing syste
 - **Frame-rate modes:** 30, 60, 120 and Uncapped FPS can be selected.
 - **Resolution options:** 1080p, 1440p and 4K options have been implemented.
 
-These are results from internal development. **Full-game compatibility, consistently high frame rates and correct behavior in every mission have not yet been verified.**
-
-### Recent progress - November 2026
-
-- **Rendering:** Significant improvements to world and character rendering. In a documented test, 99.6% of the relevant character-rendering packets used an optimized native path.
-- **Verification:** 451,589 fast-path packets matched the reference execution in a dedicated verification run. This does not establish complete graphical accuracy across the game.
-- **Performance:** A tested segment in the 120 FPS mode averaged approximately 89 FPS. Stable 120 FPS remains an optimization goal, not a current guarantee.
-- **Stuttering:** A logging-related bottleneck behind repeated driving hitches was addressed. The recurring hitches were no longer experienced in a subsequent long test, although isolated frame-time spikes remain.
-- **Timing and presentation:** Higher-frame-rate behavior, smooth frame pacing and variable-refresh-rate presentation still need more testing and refinement.
-
-## Classic and Enhanced Experiences
-
-The project aims to offer two ways to play. Players should be able to enjoy the original console experience or enable optional improvements designed for modern PCs.
-
-### Classic PS2 Experience
-
-The goal is to preserve the original gameplay and presentation as closely as possible.
-
-**Already available**
-- Original 4:3 aspect ratio
-- Classic 30 FPS mode
-- Functional controller input
-
-**In development**
-- Accurate gameplay behavior and timing
-- Original camera behavior and vehicle handling
-- Improved visual accuracy
-- Traditional controller layout
-
-**Planned**
-- Pressure-sensitive button support for compatible controllers
-- Further improvements to the original console experience
-
-### Enhanced PC Experience
-
-The Enhanced experience focuses on flexibility, higher performance and modern PC features.
-
-**Already available**
-- Selectable 30, 60, 120 and Uncapped FPS modes
-- 1080p, 1440p and 4K resolution options
-- DirectX 11 rendering
-
-**In development**
-- Improved frame pacing and stability
-- High refresh rate optimization
-- More consistent performance at higher frame rates
-- Modern controller support
-
-**Planned**
-- Increased draw distance
-- Optional graphics enhancements
-- Modern controller layouts
-- Optional free vehicle camera similar to San Andreas
-- Additional display and graphics settings
-
-Some enhancements may require changes to the original game behavior. These will remain optional whenever technically possible.
-
-
-## Development Roadmap
-
 Development is ongoing. The following milestones show what has already been achieved and what is planned for future updates.
 
 
-
+<p align="center">
+  <img src="LCS_roadmap.png" alt="LCS Recomp — unofficial concept artwork" width="1200">
+</p>
 
 Planned features may change depending on technical feasibility and development progress.
 
