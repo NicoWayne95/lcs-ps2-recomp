@@ -63,14 +63,16 @@ The immediate priorities are **gameplay correctness and performance**, rather th
 4. Resolve remaining rendering issues and improve controller compatibility.
 5. Verify a clean, reproducible Windows build and review third-party dependencies before any release.
 
-A **limited closed beta** may be considered later to gather bug reports and hardware feedback. No beta or public release date has been announced.
 
-## Building and downloads
+## Download & Installation
 
-There is currently **no public game download or verified clean-checkout build guide**. Installation steps and prerequisites will be documented after the source tree and dependencies have been audited.
+LCS Recomp is still in active development and isn't quite ready for a public release. There are a few things I want to finish first, including a dedicated launcher, an easier installation process and further improvements to performance, stability and compatibility. The launcher will eventually handle game configuration, graphics settings, controller options and launching the game without requiring command-line arguments or manual configuration. I'm also continuing to test missions, saving, loading and general gameplay to make sure everything works as expected.
 
-This repository is not intended to distribute original game disc images, executables, audio, textures, models, movies, console firmware or other proprietary game files. Any generated or recompiled output must also be checked before redistribution.
+Once the project is ready, I'll provide download links, system requirements and a proper installation guide.
 
+### Game-Files
+
+LCS Recomp will not include original game files or copyrighted assets. You'll need your own legally obtained copy of the game. More information about the required files and setup process will be provided closer to release.
 ## Credits
 
 ### PS2Recomp
