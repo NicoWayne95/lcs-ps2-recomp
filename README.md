@@ -1,7 +1,7 @@
 # LCS PS2 Recomp
 
 <p align="center">
-  <img src="docs/images/LCS_recomp2.png" alt="LCS Recomp — unofficial concept artwork" width="430">
+  <img src="LCS_recomp2.png" alt="LCS Recomp — unofficial concept artwork" width="430">
 </p>
 
 <p align="center"><strong>Experimental PlayStation 2-to-Windows recompilation project</strong></p>
