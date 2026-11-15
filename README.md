@@ -10,7 +10,7 @@
 
 ---
 
-## AI-assisted development — a note on transparency
+## AI-assisted development; a note on transparency
 
 **Yes, this project is developed with AI assistance.** I use Claude and a locally running Qwen 27B model to speed up research, code exploration, implementation, debugging, and testing. Rebuilding the execution and rendering layers needed to run PlayStation 2 software on Windows is a substantial engineering challenge. Given my current experience, doing everything without AI could take me many months, potentially much longer. AI dramatically shortens the time between an idea, a working prototype, and the next test.
 
