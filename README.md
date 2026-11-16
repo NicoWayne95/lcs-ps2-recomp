@@ -53,7 +53,7 @@ A few screenshots captured from the current development build.
   <a href="docs/screenshots/downtown-street.webp"><img src="docs/screenshots/downtown-street.webp" alt="Street scene in Liberty City" width="32%"></a>
 </p>
 
-<p align="center"><a href="docs/GALLERY.md">View all 9 screenshots</a></p>
+<p align="center"><a href="docs/GALLERY.md">View all screenshots</a></p>
 
 Development is ongoing. The following milestones show what has already been achieved and what is planned for future updates.
 
