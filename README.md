@@ -104,8 +104,11 @@ While the game is playable, several systems still require additional work:
 <h2>PC Features (Work in Progress)</h2>
 
 <p>
-LCS Recomp is gaining PC-focused menus and control options while keeping the classic in-game look. The current development build includes menus for controller setup, keyboard and mouse settings, customizable bindings and display options. Features and behavior are still subject to change.
+LCS Recomp is being expanded with PC-focused features while preserving the original game's visual identity. An experimental development build introduces redesigned menus, keyboard and mouse controls, controller configuration and additional graphics settings.
+
+The screenshots below showcase the ongoing transition toward a more complete native PC experience. Some options are still being implemented or refined.
 </p>
+
 
 <p align="center">
   <a href="docs/features/controls-overview.webp">
