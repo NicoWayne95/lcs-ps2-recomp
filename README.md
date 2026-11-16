@@ -43,6 +43,29 @@ AI-generated code can be wrong, inefficient, or incompatible with existing syste
 - **Frame-rate modes:** 30, 60, 120 and Uncapped FPS can be selected.
 - **Resolution options:** 1080p, 1440p and 4K options have been implemented.
 
+<h2>PC Features (Work in Progress)</h2>
+
+<p>
+LCS Recomp is gaining PC-focused menus and control options while keeping the classic in-game look. The current development build includes menus for controller setup, keyboard and mouse settings, customizable bindings and display options. Features and behavior are still subject to change.
+</p>
+
+<p align="center">
+  <a href="docs/features/controls-overview.webp">
+    <img src="docs/features/controls-overview.webp" width="32%" alt="LCS Recomp controls menu">
+  </a>
+  <a href="docs/features/mouse-keyboard-setup.webp">
+    <img src="docs/features/mouse-keyboard-setup.webp" width="32%" alt="LCS Recomp mouse and keyboard setup">
+  </a>
+  <a href="docs/features/display-settings.webp">
+    <img src="docs/features/display-settings.webp" width="32%" alt="LCS Recomp display settings">
+  </a>
+</p>
+
+<p align="center">
+  <a href="docs/FEATURES.md">View all PC feature screenshots</a>
+</p>
+
+
 ## Gameplay Screenshots
 
 A few screenshots captured from the current development build.
