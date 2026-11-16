@@ -27,23 +27,11 @@ Screenshots captured from the current Windows development build. All images are 
 
 <p align="center">
   <a href="screenshots/lcpd-helicopter.webp"><img src="screenshots/lcpd-helicopter.webp" width="49%" alt="Police helicopter flying above Liberty City"></a>
-  <a href="screenshots/night-police-patrol.webp"><img src="screenshots/night-police-patrol.webp" width="49%" alt="Police vehicle on a city street at night"></a>
-</p>
-<p align="center">
   <a href="screenshots/police-park.webp"><img src="screenshots/police-park.webp" width="49%" alt="Police vehicle near an open field"></a>
 </p>
 
 ## Airport & Aviation
 
-<p align="center">
-  <a href="screenshots/airport-control-tower.webp"><img src="screenshots/airport-control-tower.webp" width="49%" alt="Airport control tower"></a>
-  <a href="screenshots/airport-terminal-exterior.webp"><img src="screenshots/airport-terminal-exterior.webp" width="49%" alt="Airport terminal exterior"></a>
-</p>
-
-<p align="center">
-  <a href="screenshots/airport-approach-road.webp"><img src="screenshots/airport-approach-road.webp" width="49%" alt="Road leading to the airport"></a>
-  <a href="screenshots/delivery-van-airport.webp"><img src="screenshots/delivery-van-airport.webp" width="49%" alt="Delivery van at the airport"></a>
-</p>
 
 <p align="center">
   <a href="screenshots/plane-in-hangar.webp"><img src="screenshots/plane-in-hangar.webp" width="49%" alt="Aircraft inside a hangar"></a>
@@ -60,10 +48,16 @@ Screenshots captured from the current Windows development build. All images are 
 <p align="center">
   <a href="screenshots/city-street-red-car.webp"><img src="screenshots/city-street-red-car.webp" width="49%" alt="Red car on a Liberty City street"></a>
   <a href="screenshots/taxi-commercial-district.webp"><img src="screenshots/taxi-commercial-district.webp" width="49%" alt="Taxi in a commercial district"></a>
+  <a href="screenshots/airport-approach-road.webp"><img src="screenshots/airport-approach-road.webp" width="49%" alt="Road leading to the airport"></a>
 </p>
 
 <p align="center">
   <a href="screenshots/yellow-taxi-crosswalk.webp"><img src="screenshots/yellow-taxi-crosswalk.webp" width="49%" alt="Yellow taxi approaching a crosswalk"></a>
+  <a href="screenshots/delivery-van-airport.webp"><img src="screenshots/delivery-van-airport.webp" width="49%" alt="Delivery van at the airport"></a>
+</p>
+<p align="center">
+  <a href="screenshots/airport-control-tower.webp"><img src="screenshots/airport-control-tower.webp" width="49%" alt="Airport control tower"></a>
+  <a href="screenshots/airport-terminal-exterior.webp"><img src="screenshots/airport-terminal-exterior.webp" width="49%" alt="Airport terminal exterior"></a>
 </p>
 
 ## Rain, Night & Tunnels
@@ -83,9 +77,6 @@ Screenshots captured from the current Windows development build. All images are 
   <a href="screenshots/night-tunnel.webp"><img src="screenshots/night-tunnel.webp" width="49%" alt="Tunnel at night"></a>
 </p>
 
-<p align="center">
-  <a href="screenshots/dark-tunnel-entrance.webp"><img src="screenshots/dark-tunnel-entrance.webp" width="49%" alt="Dark tunnel entrance"></a>
-</p>
 
 ## Coast & Sunset
 
