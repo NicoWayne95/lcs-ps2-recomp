@@ -51,9 +51,9 @@ LCS Recomp has evolved far beyond a simple rendering demonstration. The game is 
 ### Graphics & Display
 
 - **Frame Rate Options:** 30, 60, 120 and Uncapped FPS.
-- **Resolution Support:** 1080p, 1440p, 4K and other PC resolutions.
-- **Widescreen Support:** 16:9 with Hor+ rendering and improved HUD positioning.
-- **Anti-Aliasing:** MSAA 2x and 4x, adjustable during gameplay.
+- **Resolution Support:** Original, 1080p, 1440p, 4K and other PC resolutions.
+- **Widescreen Support:** 16:9 with improved HUD positioning.
+- **Anti-Aliasing:** MSAA 2x, 4x and 8x, adjustable during gameplay.
 - **Anisotropic Filtering:** Runtime configuration implemented, with further visual verification ongoing.
 - **Visual Improvements:** Full-resolution trails, corrected HUD positioning and various rendering fixes.
 - **Pause Menu:** Correct 4:3 presentation regardless of gameplay aspect ratio.
