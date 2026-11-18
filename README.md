@@ -207,7 +207,7 @@ Provides the foundation for the VU1 recompiler used in LCS Recomp (`tools/vu1_re
 
 License: [GPL-3.0](https://github.com/BigDaddyJRich/hctp-recomp/blob/main/LICENSE)
 
-### Community & Beta Testers
+### Community
 
 Special thanks to ran-j, gothamor, BigDaddyJRich and all contributors to their respective projects.
 
