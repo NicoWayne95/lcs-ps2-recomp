@@ -98,8 +98,6 @@ While the game is playable, several systems still require additional work:
 
 **Development Notice:** Some features are currently available only in experimental builds. Not all functionality has been fully validated, and features may change during development.
 
-**LCS Recomp is not yet available for public release.**
-
 
 <h2>PC Features (Work in Progress)</h2>
 
