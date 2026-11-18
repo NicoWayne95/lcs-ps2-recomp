@@ -181,13 +181,43 @@ Currently, only the USA / NTSC-U version (SLUS-21423) is supported. The game is 
 
 ## Credits
 
+LCS Recomp builds upon the work of several open-source projects and their contributors. Their work provided the technical foundation that made this project possible.
+
 ### PS2Recomp
 
-This project uses parts of **[PS2Recomp by ran-j](https://github.com/ran-j/PS2Recomp)**, an experimental PlayStation 2 static recompiler and runtime project. Thanks to its developers and contributors for the work that made this possible.
+[**PS2Recomp by ran-j**](https://github.com/ran-j/PS2Recomp)
 
-PS2Recomp is published under the **[GPL-3.0 license](https://github.com/ran-j/PS2Recomp/blob/main/LICENSE)**. Attribution alone does not satisfy all license obligations; before distributing source code or binaries, the incorporated components, modifications and required notices must be reviewed.
+Provides the PlayStation 2 static recompiler and runtime that form the foundation of LCS Recomp.
 
-Additional third-party acknowledgements will be added once the codebase audit is complete.
+License: [GPL-3.0](https://github.com/ran-j/PS2Recomp/blob/main/LICENSE)
+
+### GTA: Vice City Stories Recomp
+
+[**GTA: Vice City Stories Recomp by gothamor**](https://github.com/gothamor/gta-vcs-recomp)
+
+Served as a  technical reference for LCS Recomp.
+
+License: [GPL-3.0](https://github.com/gothamor/gta-vcs-recomp/blob/main/LICENSE)
+
+### HCTP Recomp
+
+[**HCTP Recomp by BigDaddyJRich**](https://github.com/BigDaddyJRich/hctp-recomp)
+
+Provides the foundation for the VU1 recompiler used in LCS Recomp (`tools/vu1_recomp.py`).
+
+License: [GPL-3.0](https://github.com/BigDaddyJRich/hctp-recomp/blob/main/LICENSE)
+
+### Community & Beta Testers
+
+Special thanks to ran-j, gothamor, BigDaddyJRich and all contributors to their respective projects.
+
+This project would not be possible without the work of the recompilation community.
+
+### Third-Party Licenses
+
+All incorporated third-party components remain subject to their respective licenses and copyright notices.
+
+Additional attribution and licensing information can be found in the NOTICE.txt included with the distribution.
 
 ## Legal notice
 
