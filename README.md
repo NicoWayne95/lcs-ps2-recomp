@@ -162,13 +162,25 @@ The immediate priorities are **gameplay correctness and performance**, rather th
 
 ## Download & Installation
 
-LCS Recomp is still in active development and isn't quite ready for a public release. There are a few things I want to finish first, including a dedicated launcher, an easier installation process and further improvements to performance, stability and compatibility. The launcher will eventually handle game configuration, graphics settings, controller options and launching the game without requiring command-line arguments or manual configuration. I'm also continuing to test missions, saving, loading and general gameplay to make sure everything works as expected.
+The first public beta of LCS Recomp (v0.2.0) is now available!
 
-Once the project is ready, I'll provide download links, system requirements and a proper installation guide.
+LCS Recomp is still in active development. This release is intended to gather feedback on performance, stability, hardware compatibility and general gameplay. Some features are incomplete, and bugs or crashes may occur.
 
-### Game-Files
+The dedicated launcher handles ISO validation, automated game preparation, game configuration and savegame management. Future releases will also support updates directly through the launcher.
 
-LCS Recomp will not include original game files or copyrighted assets. You'll need your own legally obtained copy of the game. More information about the required files and setup process will be provided closer to release.
+**For the best current gameplay experience, I recommend playing at 60 FPS with a controller using the Classic control scheme.**
+
+- [Download the latest Public Beta](https://github.com/NicoWayne95/lcs-ps2-recomp/releases)
+- [Release Notes, Known Issues & Installation Guide](https://github.com/NicoWayne95/lcs-ps2-recomp/releases)
+- [Community Feedback & Discussions](https://github.com/NicoWayne95/lcs-ps2-recomp/discussions)
+- [Report Bugs & Technical Issues](https://github.com/NicoWayne95/lcs-ps2-recomp/issues)
+
+### Game Files
+
+LCS Recomp does not include original game files or copyrighted game assets. You need your own legally obtained copy of GTA: Liberty City Stories for PlayStation 2 in ISO format.
+
+Currently, only the USA / NTSC-U version (SLUS-21423) is supported. The game is prepared and recompiled locally on your PC through the launcher.
+
 ## Credits
 
 ### PS2Recomp
