@@ -1,0 +1,16 @@
+﻿/build/
+/obj/
+/tmp/
+/deps/
+/generated/
+/saves/
+/run_*/
+*.iso
+*.chd
+*.elf
+*.irx
+*.exe
+*.dll
+*.pdb
+*.zip
+*.log

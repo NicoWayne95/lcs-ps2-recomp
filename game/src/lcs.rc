@@ -1,0 +1,7 @@
+// LCSrecomp.exe's manifest: the UTF-8 code page (src/lcs.manifest). 1 = CREATEPROCESS_MANIFEST_RESOURCE_ID, 24 = RT_MANIFEST;
+// the linker's own manifest is off (/MANIFEST:NO in CMakeLists.txt), so this is the only one.
+1 24 "lcs.manifest"
+
+// Application icon (src/lcs.ico, 16-256 px): the first icon group in the exe is what Explorer, the taskbar and
+// Alt+Tab show. IDI 1 so the window class can load it with LoadIcon(GetModuleHandle(nullptr), MAKEINTRESOURCE(1)).
+1 ICON "lcs.ico"
