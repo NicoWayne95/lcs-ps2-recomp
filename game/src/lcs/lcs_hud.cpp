@@ -39,18 +39,34 @@ namespace lcs_hud
     {
         constexpr uint32_t kEmit2D = 0x002B1390u;
         PS2Runtime::RecompiledFunction g_origEmit = nullptr;
+        constexpr uint32_t kRadarMap = 0x00115AE0u;
+        PS2Runtime::RecompiledFunction g_origRadarMap = nullptr;
+        bool g_drawingRadarMap = false; // game thread
+
+        PS2_GUEST_CC void radarMap(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
+        {
+            const bool previous = g_drawingRadarMap;
+            g_drawingRadarMap = ctx->pc == kRadarMap && GPR_U32(ctx, 31) == 0x00241E6Cu;
+            g_origRadarMap(rdram, ctx, runtime);
+            g_drawingRadarMap = previous;
+        }
         std::atomic<bool> g_on{false};
 
         struct Prim
         {
             float x0, y0, x1, y1;
             uint32_t firstKey, keyCount;
+            bool radarMap = false;
         };
         // this frame's primitives (game thread; the mutex for the chain observer, which may run on another thread)
         std::mutex g_mutex;
         std::vector<Prim> g_prims;
         std::vector<uint32_t> g_keys;
-        using AnchorMap = std::unordered_map<uint32_t, uint8_t>;
+        struct AnchorMap : std::unordered_map<uint32_t, uint8_t>
+        {
+            bool sniper = false;
+        };
+        bool g_sniper = false; // captured with this frame's HUD primitives
         std::shared_ptr<const AnchorMap> g_anchors = std::make_shared<AnchorMap>(); // read on the GS stage
         int g_traceAnchors = 0;
 
@@ -70,9 +86,17 @@ namespace lcs_hud
             if (n == 0u || n > 1024u || verts + 16u > PS2_RAM_SIZE)
                 return;
             std::lock_guard<std::mutex> lock(g_mutex);
+            constexpr uint32_t camera = 0x43BBF0u;
+            const uint8_t activeCam = rdram[camera + 0x10Cu];
+            if (activeCam < 3)
+            {
+                uint16_t mode;
+                std::memcpy(&mode, rdram + camera + 0x220u + activeCam * 0x2B0u + 0x40u, sizeof(mode));
+                g_sniper = mode == 7u;
+            }
             if (g_prims.size() >= 8192u)
                 return;
-            Prim p{1e9f, 1e9f, -1e9f, -1e9f, static_cast<uint32_t>(g_keys.size()), n};
+            Prim p{1e9f, 1e9f, -1e9f, -1e9f, static_cast<uint32_t>(g_keys.size()), n, g_drawingRadarMap};
             for (uint32_t i = 0; i < n; ++i)
             {
                 uint32_t index = i;
@@ -87,7 +111,7 @@ namespace lcs_hud
                     return;
                 int16_t xy[2];
                 std::memcpy(xy, rdram + v + 8u, 4);
-                if (g_zFilter)
+                if (g_zFilter && !p.radarMap)
                 {
                     uint32_t z, hz;
                     std::memcpy(&z, rdram + v + 12u, 4);
@@ -155,6 +179,8 @@ namespace lcs_hud
             auto anchors = std::make_shared<AnchorMap>();
             {
                 std::lock_guard<std::mutex> lock(g_mutex);
+                anchors->sniper = g_sniper;
+                g_sniper = false;
                 const uint32_t n = static_cast<uint32_t>(g_prims.size());
                 std::vector<uint32_t> parent(n), order(n);
                 std::iota(parent.begin(), parent.end(), 0u);
@@ -167,7 +193,7 @@ namespace lcs_hud
                 auto full = [](const Prim &p) { return p.x0 <= 1.0f && p.x1 >= 639.0f; };
                 // big primitives (backgrounds, map tiles, screen-wide boxes) are elements of their own: grouping them
                 // would pull everything near them along
-                auto apart = [&](const Prim &p) { return full(p) || p.x1 - p.x0 > 320.0f; };
+                auto apart = [&](const Prim &p) { return p.radarMap || full(p) || p.x1 - p.x0 > 320.0f; };
                 constexpr float gapX = 12.0f, gapY = 3.0f;
                 std::sort(order.begin(), order.end(), [](uint32_t a, uint32_t b) { return g_prims[a].x0 < g_prims[b].x0; });
                 for (uint32_t oi = 0; oi < n; ++oi)
@@ -204,12 +230,14 @@ namespace lcs_hud
                     const Prim &p = g_prims[i];
                     const Prim &b = boxes[find(i)];
                     const float centre = (b.x0 + b.x1) * 0.5f;
-                    const uint8_t anchor = full(p) || full(b)                       ? GSHwAnchorStretch
+                    const uint8_t anchor = p.radarMap                           ? GSHwAnchorStretch
+                                           : full(p) || full(b)                       ? GSHwAnchorStretch
                                            : centre < 280.0f && b.x0 < 160.0f       ? GSHwAnchorLeft
                                            : centre > 360.0f && b.x1 > 480.0f       ? GSHwAnchorRight
                                                                                     : GSHwAnchorCentre;
-                    for (uint32_t k = 0; k < p.keyCount; ++k)
-                        (*anchors)[g_keys[p.firstKey + k]] = anchor;
+                    if (!p.radarMap)
+                        for (uint32_t k = 0; k < p.keyCount; ++k)
+                            (*anchors)[g_keys[p.firstKey + k]] = anchor;
                     if (trace && find(i) == i)
                         std::fprintf(stderr, "[hud-anchor]   x %4.0f..%4.0f y %4.0f..%4.0f prims %3u -> %s\n", b.x0, b.x1, b.y0, b.y1,
                                      b.keyCount,
@@ -218,6 +246,12 @@ namespace lcs_hud
                                      : anchor == GSHwAnchorRight ? "right"
                                                                  : "centre");
                 }
+                // A radar tile can share vertex coordinates with a different HUD element.
+                // Apply the explicit radar anchor after the positional assignments.
+                for (const Prim &p : g_prims)
+                    if (p.radarMap)
+                        for (uint32_t k = 0; k < p.keyCount; ++k)
+                            (*anchors)[g_keys[p.firstKey + k]] = GSHwAnchorStretch;
                 g_prims.clear();
                 g_keys.clear();
             }
@@ -271,6 +305,22 @@ namespace lcs_hud
         uint8_t classify(const float *xy, uint32_t count)
         {
             const AnchorMap &anchors = *g_anchors;
+            // The scope is drawn in pieces that meet at the screen centre.
+            // Keep them in the same full-frame space regardless of their individual bounds.
+            if (anchors.sniper && count >= 3)
+            {
+                float x0 = xy[0], x1 = x0, y0 = xy[1], y1 = y0;
+                for (uint32_t i = 1; i < count; ++i)
+                {
+                    x0 = std::min(x0, xy[2 * i]);
+                    x1 = std::max(x1, xy[2 * i]);
+                    y0 = std::min(y0, xy[2 * i + 1]);
+                    y1 = std::max(y1, xy[2 * i + 1]);
+                }
+                if (x1 - x0 >= 120.0f && y1 - y0 >= 100.0f &&
+                    x0 <= 321.0f && x1 >= 319.0f && y0 <= 225.0f && y1 >= 223.0f)
+                    return GSHwAnchorStretch;
+            }
             if (anchors.empty())
                 return GSHwAnchorNone;
             uint8_t anchor = GSHwAnchorNone;
@@ -293,6 +343,9 @@ namespace lcs_hud
     // the emitter hook and the chain observer (once; before the game runs)
     void install(PS2Runtime &runtime)
     {
+        g_origRadarMap = runtime.lookupFunction(kRadarMap);
+        if (g_origRadarMap)
+            runtime.replaceFunction(kRadarMap, &radarMap);
         // always hooked (the video page switches "Screen edges" live, and the weapon icon's z is for every HUD layout);
         // the per-element capture runs only while setEdges(true)
         if (!(std::getenv("LCS_HUD_SPRITE_Z") && std::getenv("LCS_HUD_SPRITE_Z")[0] == '0'))

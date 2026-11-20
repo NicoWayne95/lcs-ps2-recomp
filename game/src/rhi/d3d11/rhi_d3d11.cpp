@@ -673,6 +673,13 @@ namespace rhi
             void setPipeline(Pipeline &pipeline) override
             {
                 auto &p = static_cast<D3DPipeline &>(pipeline);
+                static const bool reusePipeline = [] {
+                    const char *value = std::getenv("LCS_D3D11_REUSE_PIPELINE");
+                    return !value || *value != '0';
+                }();
+                // Present and the ImGui backend invalidate the cached binding.
+                if (reusePipeline && m_pipeline == &p)
+                    return;
                 m_pipeline = &p;
                 m_context->IASetInputLayout(p.layout.Get());
                 m_context->IASetPrimitiveTopology(p.topology);

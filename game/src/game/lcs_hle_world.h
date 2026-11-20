@@ -4,7 +4,10 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <vector>
+
+namespace ps2hle { struct MscalContext; }
 
 namespace lcs::hleworld
 {
@@ -13,11 +16,12 @@ namespace lcs::hleworld
         bool valid = false;
         uint64_t key = 0;
         uint32_t count = 0;
-        std::vector<uint8_t> vertices; // count x 32 bytes (vs_world's layout)
+        std::shared_ptr<const std::vector<uint8_t>> vertices; // count x 32 bytes (vs_world's layout)
     };
 
     // the next world packet the native handler draws stores its mesh here (it is marked valid when it does)
     void setMeshCapture(WorldMesh *capture);
     // the next world packet takes its mesh from here when it has the same vertex count (the replay of the same block)
     void setMeshHint(const WorldMesh *hint);
+    bool drawRecordedWorld(const ps2hle::MscalContext &context);
 }

@@ -58,7 +58,8 @@ extern std::atomic<uint64_t> g_ps2xVu1CutBudget, g_ps2xVu1CutStop;
 #include <string>
 
 int g_lcsPresentMode = 2;       // [lcs] choosePresentMode / the video page: 0 immediate, 1 vsync, 2 tearing (VRR)
-int g_lcsReflectionFilter = 1;  // [lcs] the reflection map's filter (gsHwSetTargetFilter 420): 0 GS, 1 smooth, 2 smooth above 1x
+constexpr int kDefaultReflectionFilter = 0;
+int g_lcsReflectionFilter = kDefaultReflectionFilter;  // [lcs] the reflection map's filter (gsHwSetTargetFilter 420): 0 GS, 1 smooth, 2 smooth above 1x
 
 namespace
 {
@@ -66,15 +67,15 @@ namespace
     struct DisplayState
     {
         bool wide = true;        // 16:9 (the default) or 4:3, the PS2's TV
-        int hudMode = 0;         // 0 squeeze, 1 edges, 2 stretch
+        int hudMode = 1;         // 0 squeeze, 1 edges, 2 stretch
         float squeeze = 0.875f;  // squeeze mode: the HUD's width factor (0.75 = 4:3 shape .. 1 = as drawn)
     };
     DisplayState g_display;
 
     // 16:9: 3D frames shown at 16:9 (present::setDisplayAspect; menus and loading screens stay 4:3), the game's view
     // window widened Hor+ (lcs_bootstrap); as the reference port's applyAspect: post effects keep their 4:3 proportions, the HUD its
-    // shape by mode - "squeeze" (default, user request 14.11.) the whole HUD squeezed around the middle, "edges" each
-    // element in its 4:3 shape at its own screen edge (src/lcs/lcs_hud.cpp), "stretch" as drawn. 4:3: none of it.
+    // shape by mode: "edges" (default) anchors each element at its screen edge, "squeeze" centres the HUD
+    // around the middle, and "stretch" uses the drawn proportions. The 4:3 mode uses native HUD coordinates.
     void applyDisplay()
     {
         const DisplayState &d = g_display;
@@ -199,8 +200,11 @@ namespace
             const char *e = std::getenv("LCS_ASPECT");
             g_display.wide = !(e && std::string_view(e) == "4:3");
             const char *hud = std::getenv("LCS_HUD");
-            const std::string_view mode = hud && *hud ? std::string_view(hud) : std::string_view("squeeze");
-            g_display.hudMode = mode == "edges" ? 1 : mode == "stretch" ? 2 : 0;
+            const std::string_view mode = hud ? hud : "";
+            if (mode == "squeeze")
+                g_display.hudMode = 0;
+            else if (mode == "stretch")
+                g_display.hudMode = 2;
             if (const char *s = std::getenv("LCS_HUD_SQUEEZE"); s && *s)
                 g_display.squeeze = std::clamp(static_cast<float>(std::atof(s)), 0.75f, 1.0f);
             applyDisplay();
@@ -881,8 +885,8 @@ namespace
         const char *defaults[][2] = {
             {"LCS_SAVE_DIR", saves.c_str()}, {"LCS_ISO", iso.c_str()}, {"PS2X_HW_SCALE", "0"}, {"PS2X_HW_MSAA", "8"},
             {"PS2X_HW_ANISO", "1"}, {"LCS_TRAILS", "1"}, {"LCS_RSL", "replay"}, {"LCS_CONTROLLER_PROFILE", "classic"},
-            {"SDL_JOYSTICK_DIRECTINPUT", "1"}, {"SDL_JOYSTICK_HIDAPI", "0"}, {"SDL_JOYSTICK_WGI", "0"},
-            {"SDL_JOYSTICK_GAMEINPUT", "0"}, {"SDL_JOYSTICK_RAWINPUT", "0"}, {"SDL_XINPUT_ENABLED", "0"},
+            {"SDL_JOYSTICK_DIRECTINPUT", "1"}, {"SDL_JOYSTICK_WGI", "0"},
+            {"SDL_JOYSTICK_GAMEINPUT", "0"}, {"SDL_JOYSTICK_RAWINPUT", "0"},
             {"PS2X_VU1_COMPILED", "1"}, {"LCS_INDEPENDENT_TIMING", "0"}, {"LCS_FULLSCREEN", "1"},
             {"PS2X_RENDER_THREAD", "1"}, {"LCS_CTIMER_HOST", "1"}, {"PS2X_DMA_MAX_TAGS", "1048576"}};
         // the flags first: they win over the environment and the defaults
@@ -1119,12 +1123,12 @@ int main(int argc, char *argv[])
         { // [lcs] LCS's render targets by role - the same VRAM layout as the reference port (run_202321 RT-read log: frame FBP 140, shown
           // FBP 0, the cars' reflection map FBP 420 fbw 2 = 128x128, trails FBP 384 fbw 8), registered as the the reference port display
           // layer does (ref_display.cpp installDisplayHooks): the reflection map takes the frame's scale instead of 1x,
-          // read through the renderer's filter (the reference port setReflectionFilter "smooth"). LCS_REFLECTION_FILTER=0/1/2.
+          // read through the renderer's filter. LCS_REFLECTION_FILTER=0/1/2.
             gsHwSetTargetRole(140u, 10u, "frame", false);
             gsHwSetTargetRole(0u, 10u, "shown picture", false);
             gsHwSetTargetRole(420u, 2u, "reflection map (128x128 sample of the frame)", true);
             gsHwSetTargetRole(384u, 8u, "trails", false);
-            int filter = 1;
+            int filter = kDefaultReflectionFilter;
             if (const char *e = std::getenv("LCS_REFLECTION_FILTER"); e && *e >= '0' && *e <= '2')
                 filter = *e - '0';
             gsHwSetTargetFilter(420u, 2u, filter);

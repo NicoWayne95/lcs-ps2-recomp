@@ -22,6 +22,8 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
+#include <unordered_map>
 
 namespace
 {
@@ -111,6 +113,15 @@ namespace lcs_timestep
         constexpr uint32_t kTimeMs = 0x003D9B70u, kPrevTimeMs = 0x003D9BC4u, kReplayMode = 0x003D9C8Cu;
         PS2Runtime::RecompiledFunction g_orig = nullptr;
         float g_lead = 0.0f;
+        bool g_payback = true;
+        bool g_effectTick30 = false;
+        float g_effectShare30 = 1.0f;
+        float g_cloudPhaseRemainder = 0.0f;
+
+        uint32_t effectFrame30(uint32_t milliseconds)
+        {
+            return static_cast<uint32_t>((uint64_t(milliseconds) * 30u + 29u) / 1000u);
+        }
 
         float rdf(const uint8_t *ram, uint32_t a)
         {
@@ -129,7 +140,18 @@ namespace lcs_timestep
         {
             if (ctx->pc != kTimerUpdate)
                 return g_orig(rdram, ctx, runtime);
+            // Capture the clock before the timer advances instead of using its internal
+            // capped-step baseline. All emitters and particles share this decision.
+            const uint32_t before = rd32(rdram, kTimeMs);
             g_orig(rdram, ctx, runtime);
+            const uint32_t after = rd32(rdram, kTimeMs);
+            g_effectTick30 = after > before && effectFrame30(after) != effectFrame30(before);
+            const uint32_t elapsed = after >= before ? after - before : 0u;
+            g_effectShare30 = static_cast<float>(elapsed) * (30.0f / 1000.0f);
+            if (after < before)
+                g_cloudPhaseRemainder = 0.0f;
+            if (!g_payback)
+                return;
             const float step = rdf(rdram, kStep);
             const int32_t dms = static_cast<int32_t>(rd32(rdram, kTimeMs) - rd32(rdram, kPrevTimeMs));
             if (dms <= 0 || dms > 60 || rdram[kReplayMode] == 1u || !(step > 0.0f) || step > 3.0f)
@@ -152,18 +174,174 @@ namespace lcs_timestep
 
     void install(PS2Runtime &runtime)
     {
-        if (const char *e = std::getenv("LCS_STEP_PAYBACK"); (e && e[0] == '0') || minStep() >= 0.5f)
-        {
-            std::fprintf(stderr, "[timestep] floor excess not paid back (LCS_STEP_PAYBACK=0 or the PS2 floor)\n");
-            return;
-        }
+        const char *payback = std::getenv("LCS_STEP_PAYBACK");
+        g_payback = !(payback && payback[0] == '0') && minStep() < 0.5f;
+        g_effectTick30 = false;
+        g_effectShare30 = 1.0f;
+        g_cloudPhaseRemainder = 0.0f;
+        g_lead = 0.0f;
         g_orig = runtime.lookupFunction(kTimerUpdate);
         if (!g_orig)
         {
             std::fprintf(stderr, "[timestep] CTimer::Update 0x2B4CF8 missing: floor excess not paid back\n");
             return;
         }
-        runtime.replaceFunction(kTimerUpdate, &timerUpdate);
-        std::fprintf(stderr, "[timestep] the floor's excess is paid back on the next frames (steps follow the game clock)\n");
+        if (!runtime.replaceFunction(kTimerUpdate, &timerUpdate))
+        {
+            std::fprintf(stderr, "[timestep] could not install the timer hook\n");
+            return;
+        }
+        std::fprintf(stderr, "[timestep] 30 Hz effects clock active; step payback %s\n", g_payback ? "on" : "off");
     }
+}
+
+// Quantize the game clock for effects with discrete 30 FPS updates.
+uint32_t lcsEffectFrame30(const uint8_t *rdram)
+{
+    return lcs_timestep::effectFrame30(lcs_timestep::rd32(rdram, lcs_timestep::kTimeMs));
+}
+
+// CEntity::UpdateAnim supplies a floored simulation step to gameplay peds.
+// Use the elapsed game clock while the player is stationary and on foot.
+float lcsPlayerIdleDelta(const uint8_t *rdram, uint32_t entity, float delta)
+{
+    using namespace lcs_timestep;
+    const uint32_t playerInfo = 0x00408E40u + rdram[0x003D9BC8u] * 0x190u;
+    if (entity < 0x00100000u || entity > PS2_RAM_SIZE - 0x539u ||
+        entity != rd32(rdram, playerInfo) || rdram[entity + 0x538u] || rdram[kReplayMode] == 1u ||
+        !(delta > 0.0f) || delta >= 0.031f)
+        return delta;
+
+    const float vx = rdf(rdram, entity + 0x70u);
+    const float vy = rdf(rdram, entity + 0x74u);
+    const float vz = rdf(rdram, entity + 0x78u);
+    if (vx * vx + vy * vy + vz * vz >= 0.000025f)
+        return delta;
+
+    const float corrected = g_effectShare30 / 30.0f;
+    if (!(corrected >= 0.0f && corrected <= 0.050f))
+        return delta;
+    static const bool trace = std::getenv("LCS_TRACE_IDLE_ANIM") != nullptr;
+    if (trace)
+    {
+        static unsigned frames = 0;
+        static float stockSum = 0, elapsedSum = 0;
+        stockSum += delta;
+        elapsedSum += corrected;
+        if (++frames == 120)
+        {
+            std::fprintf(stderr, "[idle-anim] 120 updates: original %.3f s, game clock %.3f s\n", stockSum, elapsedSum);
+            frames = 0;
+            stockSum = elapsedSum = 0.0f;
+        }
+    }
+    return corrected;
+}
+
+// Each board has its own phase in the eight-step scheduler. Remember the
+// bucket per slot so a repeated render or a missed exact phase cannot change the rate.
+bool lcsAdvanceSign(const uint8_t *rdram, uint32_t slot)
+{
+    static uint32_t lastBucket[12]{};
+    if (slot >= 12)
+        return false;
+    const uint32_t bucket = (lcsEffectFrame30(rdram) + slot) / 8u + 1u;
+    if (bucket == lastBucket[slot])
+        return false;
+    lastBucket[slot] = bucket;
+    return true;
+}
+
+float lcsSignStep()
+{
+    // Render-side interpolated scroll still reads the floored simulation step.
+    return lcs_timestep::g_effectShare30 * (50.0f / 30.0f);
+}
+
+bool lcsEffectTick30(const uint8_t *)
+{
+    return lcs_timestep::g_effectTick30;
+}
+
+float lcsSmokeExpansion(const uint8_t *rdram, float expansion)
+{
+    float step;
+    std::memcpy(&step, rdram + lcs_timestep::kStep, sizeof(step));
+    constexpr float ps2Step = 50.0f / 30.0f;
+    return step >= 0.0f && step < ps2Step ? expansion * (step / ps2Step) : expansion;
+}
+
+namespace
+{
+    struct TyreSmokeAge
+    {
+        uint32_t born;
+        uint32_t fadeSteps = 0;
+    };
+
+    // The guest reuses particle slots. Retain one entry per slot and reset it on creation.
+    std::unordered_map<uint32_t, TyreSmokeAge> g_tyreSmoke;
+}
+
+void lcsStartTyreSmoke(const uint8_t *rdram, uint32_t particle)
+{
+    g_tyreSmoke.insert_or_assign(particle, TyreSmokeAge{lcs_timestep::rd32(rdram, lcs_timestep::kTimeMs)});
+}
+
+int lcsTyreSmokeFade(const uint8_t *rdram, uint32_t particle, int fade)
+{
+    const auto found = g_tyreSmoke.find(particle);
+    if (found == g_tyreSmoke.end())
+        return lcsEffectTick30(rdram) ? fade : 0;
+
+    TyreSmokeAge &age = found->second;
+    const uint32_t now = lcs_timestep::rd32(rdram, lcs_timestep::kTimeMs);
+    if (now < age.born)
+        age = {now};
+    const uint32_t steps = 1u + lcs_timestep::effectFrame30(now - age.born);
+    const uint32_t due = steps > age.fadeSteps ? steps - age.fadeSteps : 0u;
+    age.fadeSteps = steps;
+    return fade * static_cast<int>(std::min(due, 255u));
+}
+
+// Sample the actual retirement path to distinguish alpha fade from expiry or other removal.
+void lcsTraceTyreSmokeRemoval(const uint8_t *rdram, uint32_t particle)
+{
+    static const bool trace = std::getenv("LCS_TRACE_TYRE_SMOKE") != nullptr;
+    if (!trace)
+        return;
+
+    static unsigned retired = 0, expired = 0, transparent = 0, other = 0;
+    const uint32_t now = lcs_timestep::rd32(rdram, lcs_timestep::kTimeMs);
+    const uint32_t expiry = lcs_timestep::rd32(rdram, particle + 0x20u);
+    if (expiry < now)
+        ++expired;
+    else if (rdram[particle + 0x2Du] == 0u)
+        ++transparent;
+    else
+        ++other;
+
+    if (++retired == 16u || retired % 128u == 0u)
+    {
+        const auto found = g_tyreSmoke.find(particle);
+        const uint32_t lifetime = found != g_tyreSmoke.end() && now >= found->second.born ? now - found->second.born : 0u;
+        std::fprintf(stderr, "[tyre-smoke] t=%u retired=%u expired=%u alpha-zero=%u other=%u last-life-ms=%u step=%.3f\n",
+                     now, retired, expired, transparent, other, lifetime, lcs_timestep::rdf(rdram, lcs_timestep::kStep));
+    }
+}
+
+// Scale only legacy per-frame animation terms. Existing time-based wave phases stay intact.
+float lcsEffectShare30()
+{
+    return lcs_timestep::g_effectShare30;
+}
+
+float lcsCloudPhaseStep(float increment)
+{
+    // The guest stores the resulting cloud angle as an integer. Preserve sub-unit motion.
+    float &remainder = lcs_timestep::g_cloudPhaseRemainder;
+    const float accumulated = increment + remainder;
+    const float whole = std::trunc(accumulated);
+    remainder = accumulated - whole;
+    return whole;
 }

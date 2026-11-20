@@ -9,14 +9,11 @@
 // * 3 / 100) - the high bits stay, so any frame-stamp compare there is off by at most 63; the real counter is put back
 // when it returns. At 30 fps the flashing looks as before. LCS_HUD_FLASH=0: off.
 //
-// 2026-11-18 (the user's report: the wanted stars still strobed at 120+ fps): the stars are not CHud::Draw's - the 2D
-// pass 0x1F6338 calls 0x23B060 after it, which draws them gold (194,165,120) while the level changed less than 4 s ago
-// (0xFA1 ms) and `counter & 1` (0x23B24C): a toggle every frame, 15 Hz on the PS2, 60 Hz at 120 fps. So the counter is
-// now swapped for the whole 2D pass (as the reference port's twoDPass FUN_0021f348): CHud::Draw, the wanted stars,
-// the radar and the texts after it.
+// The six-star loop in CHud::Draw reads its own real-time blink phase (0x240B28 and 0x240B64).
 #include "ps2_runtime.h"
 #include "ps2_runtime_macros.h"
 
+#include <chrono>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
@@ -68,4 +65,30 @@ namespace lcs_hud_timing
         runtime.replaceFunction(kHudDraw, &hudDraw);
         std::fprintf(stderr, "[hud-timing] the HUD flashes on the game clock (30 a second)\n");
     }
+}
+
+// Called directly by the two-state color test in the wanted HUD.
+uint32_t lcsWantedBlinkPhase(uint32_t original)
+{
+    using Clock = std::chrono::steady_clock;
+    static const bool enabled = [] {
+        const char *value = std::getenv("LCS_HUD_FLASH");
+        return !value || value[0] != '0';
+    }();
+    if (!enabled)
+        return original & 1u;
+    const auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(Clock::now().time_since_epoch()).count();
+    const auto tick = elapsed / 250;
+    const uint32_t phase = static_cast<uint32_t>(tick & 1);
+    static const bool trace = std::getenv("LCS_WANTED_BLINK_LOG") != nullptr;
+    if (trace)
+    {
+        static int64_t lastTick = -1;
+        if (tick != lastTick)
+        {
+            std::fprintf(stderr, "[wanted-blink] host %lld ms phase %u\n", static_cast<long long>(elapsed), phase);
+            lastTick = tick;
+        }
+    }
+    return phase;
 }

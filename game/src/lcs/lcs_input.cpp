@@ -9,9 +9,7 @@
 // 0x3D9CB4 / 0x3D9C68): arrows, Enter, Esc / Backspace.
 //
 // Keyboard & mouse never lock on (the user's decision 2026-11-16): nothing sends R1 on foot; the right mouse button is
-// free aim's (not built yet: until then it does nothing on foot). The mouse turns the camera through the right stick
-// meanwhile (1500 counts a second = full tilt; the 1:1 mouse camera is a later step); in a vehicle only with the right
-// button held (SA's mouse look). Wheel notches are short presses (platform: 50 ms), one weapon / station each.
+// free aim's. In supported vehicle follow views, mouse movement orbits the camera directly. Wheel notches are short presses (platform: 50 ms), one weapon / station each.
 //
 // Device detection: the last device used wins - a bound key, a mouse button or a mouse movement makes it keyboard &
 // mouse, a gamepad button or a stick past 0.35 the gamepad; logged on a change ([lcs-input] device ...). The mouse is
@@ -57,7 +55,7 @@ namespace lcs_input
         PS2Runtime *g_runtime = nullptr;
         std::atomic<int> g_sensitivity{3};  // 0..9 bars: 0.25 + 0.25 x step (3 = 1.0, the 1500 counts a second)
         std::atomic<bool> g_rawInput{true};
-        std::atomic<bool> g_invertMouse{false}; // INVERT MOUSE: ON = the mouse forward looks down (OFF: forward looks up)
+        std::atomic<bool> g_invertMouse{false}; // INVERT MOUSE: OFF follows the mouse vertically, ON reverses it
         float sensitivityScale() { return 0.25f + 0.25f * static_cast<float>(g_sensitivity.load(std::memory_order_relaxed)); }
         std::atomic<int> g_device{kKeyboardMouse};
         std::atomic<bool> g_menuUp{false}, g_inVehicle{false};
@@ -106,7 +104,6 @@ namespace lcs_input
             Bind camera{KEY_V, KEY_HOME, 0};
             Bind handbrake{KEY_SPACE, KEY_RIGHT_CONTROL, 0};
             Bind lookBehind{KEY_MOUSE_MIDDLE, 0, 0};
-            Bind mouseLook{KEY_MOUSE_RIGHT, 0, 0};
             Bind lookLeft{KEY_Q, 0, 0}, lookRight{KEY_E, 0, 0};
             Bind specialLeft{KEY_KP_4, 0, 0}, specialRight{KEY_KP_6, 0, 0}, specialUp{KEY_KP_8, 0, 0}, specialDown{KEY_KP_2, 0, 0};
         } g_vehicle;
@@ -268,11 +265,7 @@ namespace lcs_input
                     wrf(ram, at + 4u, py + ox * sn + oy * c);
                 }
             }
-            // LCS's pitch has the reference port's sign the other way (+ looks down: mouse forward looked down on foot while free aim
-            // looked up, user's test 2026-11-16): INVERT MOUSE flips up / down on foot and aiming alike; the limits swap
-            // with it (down 1.484 from the table's +0x38, up 0.785 from +0x34). 2026-11-19 (beta testers: "Invert ON is
-            // actually not inverted"): OFF is now the usual PC mouse look, ON the inverted one - OFF was the inverted one
-            // (mouse down looked up, set as the default 2026-11-17).
+            // Camera pitch is positive down. Invert Mouse reverses the vertical look direction.
             const float up = (g_invertMouse.load(std::memory_order_relaxed) ? -dy : dy) * look; // + : look up
             const float alpha = rdf(ram, cam + 0xE0u);
             const float tilt = std::clamp(alpha - up, -rdf(ram, kCamTable + 0x34u), rdf(ram, kCamTable + 0x38u)) - alpha;
@@ -325,22 +318,112 @@ namespace lcs_input
             return true;
         }
 
-        bool playerInVehicle()
+        constexpr uint32_t kProcessCamera = 0x0027A380u;
+        constexpr uint32_t kCameraSource = 0x1D0u;
+        PS2Runtime::RecompiledFunction g_origProcessCamera = nullptr;
+        uint32_t g_savedCam = 0, g_mouseVehicle = 0;
+        uint16_t g_vehicleMode = 0;
+        float g_savedSource[3]{};
+        float g_carDx = 0, g_carDy = 0, g_carYaw = 0, g_carPitch = 0;
+        std::chrono::steady_clock::time_point g_lastOrbit{}, g_lastOrbitInput{};
+
+        PS2_GUEST_CC void processCamera(uint8_t *ram, R5900Context *ctx, PS2Runtime *runtime)
+        {
+            // The native follow calculation must not accumulate the absolute mouse offset.
+            if (ctx->pc == kProcessCamera && g_savedCam && (GPR_U32(ctx, 4) & PS2_RAM_MASK) == g_savedCam)
+            {
+                std::memcpy(ram + g_savedCam + kCameraSource, g_savedSource, sizeof(g_savedSource));
+                g_savedCam = 0;
+            }
+            g_origProcessCamera(ram, ctx, runtime);
+        }
+
+        void vehicleMouseView(uint8_t *ram, uint32_t cam, uint32_t target)
+        {
+            if (!g_mouseVehicle || !g_origProcessCamera)
+                return;
+            const uint8_t active = ram[kTheCamera + 0x10Cu];
+            if (active >= 3 || cam != kTheCamera + 0x220u + active * 0x2B0u)
+                return;
+            uint16_t mode;
+            std::memcpy(&mode, ram + cam + 0x40u, sizeof(mode));
+            if (mode != 3 && mode != 18 && mode != 22)
+                return;
+            if (mode != g_vehicleMode)
+            {
+                g_vehicleMode = mode;
+                g_carYaw = g_carPitch = 0.0f;
+            }
+            const float dx = g_carDx, dy = g_carDy;
+            g_carDx = g_carDy = 0.0f;
+            const auto now = std::chrono::steady_clock::now();
+            const float dt = std::clamp(std::chrono::duration<float>(now - g_lastOrbit).count(), 0.0f, 0.1f);
+            g_lastOrbit = now;
+            if (dx != 0.0f || dy != 0.0f)
+            {
+                const float rate = 0.0025f * sensitivityScale();
+                g_carYaw = std::remainder(g_carYaw - dx * rate, 6.2831855f);
+                const float up = g_invertMouse.load(std::memory_order_relaxed) ? dy : -dy;
+                g_carPitch = std::clamp(g_carPitch + up * rate, -0.65f, 0.65f);
+                g_lastOrbitInput = now;
+            }
+            else if (now - g_lastOrbitInput > std::chrono::milliseconds(1500))
+            {
+                g_carYaw *= std::exp(-dt / 0.6f);
+                g_carPitch *= std::exp(-dt / 0.6f);
+            }
+            if (std::fabs(g_carYaw) + std::fabs(g_carPitch) < 0.001f)
+                return;
+
+            const uint32_t source = cam + kCameraSource;
+            const float tx = rdf(ram, target), ty = rdf(ram, target + 4u), tz = rdf(ram, target + 8u);
+            const float x = rdf(ram, source) - tx, y = rdf(ram, source + 4u) - ty, z = rdf(ram, source + 8u) - tz;
+            const float horizontal = std::hypot(x, y), radius = std::hypot(horizontal, z);
+            if (!(horizontal > 0.01f) || !std::isfinite(radius))
+                return;
+
+            const float yaw = std::atan2(y, x) + g_carYaw;
+            // Keep a mouse orbit out of the underbody view. Preserve the native
+            // camera's lower position when the game already chose one.
+            const float carHeight = rdf(ram, g_mouseVehicle + 0x38u);
+            const float floor = std::min(tz + z, std::max(tz - 0.20f, carHeight + 0.20f));
+            const float maxElevation = std::asin(std::clamp((tz - floor) / radius, -1.0f, 1.0f));
+            const float elevation = std::min(maxElevation,
+                std::clamp(std::atan2(-z, horizontal) + g_carPitch, -1.25f, 1.25f));
+            const float h = radius * std::cos(elevation);
+            std::memcpy(g_savedSource, ram + source, sizeof(g_savedSource));
+            g_savedCam = cam;
+            // The guest code clips this candidate and derives Front and Up from the result.
+            wrf(ram, source, tx + h * std::cos(yaw));
+            wrf(ram, source + 4u, ty + h * std::sin(yaw));
+            wrf(ram, source + 8u, tz - radius * std::sin(elevation));
+        }
+
+        uint32_t playerVehicle()
         {
             const uint32_t player = g_runtime->memory().read8(0x003D9BC8u);
             const uint32_t ped = rd32(0x00408E40u + player * 0x190u);
-            return ped && ped < (PS2_RAM_MASK & ~0xFu) && rd32(ped + 0x538u) != 0u && rd32(ped + 0x534u) != 0u;
+            return ped && ped < (PS2_RAM_MASK & ~0xFu) && rd32(ped + 0x538u) != 0u ? rd32(ped + 0x534u) : 0u;
         }
 
         // any key / button the keyboard-and-mouse side would use (device detection)
         bool kbmTouched(float mdx, float mdy)
         {
-            if (std::fabs(mdx) + std::fabs(mdy) > 2.0f)
-                return true;
+            static std::array<bool, KEY_COUNT> previous{};
+            bool touched = std::fabs(mdx) + std::fabs(mdy) > 2.0f;
             for (int k = 32; k < KEY_COUNT; ++k)
-                if (k != KEY_WHEEL_UP && k != KEY_WHEEL_DOWN && keyDown(k))
-                    return true;
-            return keyDown(KEY_WHEEL_UP) || keyDown(KEY_WHEEL_DOWN);
+            {
+                const bool down = keyDown(k);
+                touched |= down && !previous[k];
+                previous[k] = down;
+            }
+            return touched;
+        }
+
+        float drivingPressure(int raw, float fullPressure)
+        {
+            // Light presses should clear the in-game steering dead zone.
+            return std::sqrt(std::min(raw / fullPressure, 1.0f));
         }
 
         float stickAxis(GamepadAxis a)
@@ -349,7 +432,7 @@ namespace lcs_input
             return std::fabs(v) < 0.12f ? 0.0f : v;
         }
 
-        bool reader(uint8_t *data)
+        bool reader(uint8_t *data, int &gas, int &brake)
         {
             if (!g_runtime)
                 return false;
@@ -359,7 +442,6 @@ namespace lcs_input
             float lx = 0, ly = 0, rx = 0, ry = 0;
 
             // the gamepad, as the built-in mapping
-            bool padUsed = false;
             if (physical && gamepadConnected())
             {
                 const struct { GamepadButton b; uint16_t m; } map[] = {
@@ -379,7 +461,6 @@ namespace lcs_input
                 ly = stickAxis(AXIS_LEFT_Y);
                 rx = stickAxis(AXIS_RIGHT_X);
                 ry = stickAxis(AXIS_RIGHT_Y);
-                padUsed = btn != 0 || std::max({std::fabs(lx), std::fabs(ly), std::fabs(rx), std::fabs(ry)}) > 0.35f;
             }
 
             // the mouse's movement since the last read (the free camera takes it while it flies)
@@ -395,8 +476,17 @@ namespace lcs_input
             const bool kbmUsed = physical && kbmTouched(mdx, mdy);
             if (g_device.load(std::memory_order_relaxed) == kGamepad && g_turnCap[0] >= 0.0f)
                 holdAutoTurn(g_runtime->memory().getRDRAM(), false); // the gamepad: the game's own camera turn
+            static uint64_t lastPadActivity = 0;
+            const uint64_t activity = gamepadActivitySerial();
+            const bool connected = gamepadConnected();
+            const bool padStartedInput = physical && connected && activity != lastPadActivity;
+            lastPadActivity = activity;
             const int before = g_device.load(std::memory_order_relaxed);
-            const int device = padUsed && !kbmUsed ? kGamepad : kbmUsed && !padUsed ? kKeyboardMouse : before;
+            int device = before;
+            if (!connected || kbmUsed)
+                device = kKeyboardMouse;
+            else if (padStartedInput)
+                device = kGamepad;
             if (device != before)
             {
                 g_device.store(device, std::memory_order_relaxed);
@@ -405,7 +495,40 @@ namespace lcs_input
 
             // keyboard & mouse
             const bool menu = g_menuUp.load(std::memory_order_relaxed);
-            const bool vehicle = !menu && playerInVehicle();
+            const uint32_t playerCar = menu ? 0u : playerVehicle();
+            const bool vehicle = playerCar != 0;
+            // Soften small aim movements and cap the speed at full stick deflection.
+            if (physical && !blocked && !fly && !menu && !vehicle && device == kGamepad &&
+                gamepadFamily() == GamepadFamily::Xbox)
+            {
+                const uint8_t *ram = g_runtime->memory().getRDRAM();
+                const uint32_t cam = kTheCamera + 0x220u + ram[kTheCamera + 0x10Cu] * 0x2B0u;
+                uint16_t mode;
+                std::memcpy(&mode, ram + cam + 0x40u, sizeof(mode));
+                if (mode == 11u || scopeMode(mode))
+                {
+                    const float deflection = std::max(std::fabs(lx), std::fabs(ly));
+                    const float gain = 0.42f + 0.25f * deflection;
+                    lx *= gain;
+                    ly *= gain;
+                }
+            }
+            const bool mouseView = physical && !blocked && !fly && device == kKeyboardMouse && mouseCaptured() &&
+                                   !(btn & (PAD_L2 | PAD_R2 | PAD_SELECT)) &&
+                                   !g_vehicle.lookLeft.down() && !g_vehicle.lookRight.down() &&
+                                   !g_vehicle.lookBehind.down() && !g_vehicle.camera.down();
+            const uint32_t mouseCar = mouseView ? playerCar : 0u;
+            if (mouseCar != g_mouseVehicle)
+            {
+                g_mouseVehicle = mouseCar;
+                g_vehicleMode = 0;
+                g_carDx = g_carDy = g_carYaw = g_carPitch = 0.0f;
+            }
+            if (mouseCar)
+            {
+                g_carDx += mdx;
+                g_carDy += mdy;
+            }
             g_inVehicle.store(vehicle, std::memory_order_relaxed);
             if (physical && !blocked)
             {
@@ -552,7 +675,10 @@ namespace lcs_input
                             std::memcpy(&dummy, ram + ped + 0x6BCu, 4);
                         if (dummy && dummy < (PS2_RAM_MASK & ~0xFu) && dummy != ped)
                         {
-                            constexpr float kDummyDistance = 12.0f, kPivotHeight = 0.6f, kPitchLimit = 0.9f;
+                            constexpr float kDummyDistance = 12.0f, kPivotHeight = 0.6f;
+                            // Steeper target angles can make the guest drop the aiming mode.
+                            // These bounds apply only to the third-person mouse aim target.
+                            constexpr float kAimPitchMin = -0.52f, kAimPitchMax = 0.52f;
                             if (!aiming)
                             {
                                 // start where the camera looks, about level
@@ -565,8 +691,8 @@ namespace lcs_input
                             }
                             const float look = 0.0025f * sensitivityScale();
                             const float turn = -mdx * look;
-                            const float up = (g_invertMouse.load(std::memory_order_relaxed) ? mdy : -mdy) * look; // + : up (as on foot: OFF the usual mouse look, ON inverted)
-                            const float pitch = std::clamp(aimPitch + up, -kPitchLimit, kPitchLimit);
+                            const float up = (g_invertMouse.load(std::memory_order_relaxed) ? mdy : -mdy) * look; // + : up
+                            const float pitch = std::clamp(aimPitch + up, kAimPitchMin, kAimPitchMax);
                             const float tilt = pitch - aimPitch;
                             aimYaw = std::remainder(aimYaw + turn, 6.2831855f);
                             aimPitch = pitch;
@@ -667,7 +793,8 @@ namespace lcs_input
                     if (!aimCamera && aiming)
                     {
                         aiming = false;
-                        std::fprintf(stderr, "[lcs-aim] native free aim off\n");
+                        std::fprintf(stderr, "[lcs-aim] native free aim off (pitch %.3f, aim held %u, mode %u)\n",
+                                     aimPitch, unsigned(aimNow), unsigned(camMode));
                     }
                     aimWas = aimNow;
                     if (!aimCamera)
@@ -711,6 +838,30 @@ namespace lcs_input
                 else
                 {
                     const Vehicle &v = g_vehicle;
+                    if (!fly && device == kGamepad && gamepadConnected())
+                    {
+                        constexpr float fullSteeringPressure = 120.0f;
+                        constexpr float fullPedalPressure = 95.0f;
+                        const int left = gamepadButtonPressure(GAMEPAD_DPAD_LEFT);
+                        const int right = gamepadButtonPressure(GAMEPAD_DPAD_RIGHT);
+                        if (left >= 0 && right >= 0)
+                        {
+                            // Suppress digital steering so a light press is not treated as full lock.
+                            btn &= ~(PAD_LEFT | PAD_RIGHT);
+                            if (lx == 0.0f)
+                            {
+                                const int direction = right - left;
+                                lx = std::copysign(drivingPressure(std::abs(direction), fullSteeringPressure), direction);
+                            }
+                        }
+                        const int cross = gamepadButtonPressure(GAMEPAD_SOUTH);
+                        const int square = gamepadButtonPressure(GAMEPAD_WEST);
+                        if (cross >= 0 && square >= 0)
+                        {
+                            gas = v.accelerate.down() || v.tripSkip.down() ? 255 : std::lround(255.0f * drivingPressure(cross, fullPedalPressure));
+                            brake = v.brake.down() ? 255 : std::lround(255.0f * drivingPressure(square, fullPedalPressure));
+                        }
+                    }
                     press(v.fire.down(), PAD_CIRCLE);
                     press(v.accelerate.down() || v.tripSkip.down(), PAD_CROSS);
                     press(v.brake.down(), PAD_SQUARE);
@@ -726,11 +877,6 @@ namespace lcs_input
                     ly = axis(ly, v.steerDown.down(), v.steerUp.down());
                     rx = axis(rx, v.specialLeft.down(), v.specialRight.down());
                     ry = axis(ry, v.specialUp.down(), v.specialDown.down());
-                    if (v.mouseLook.down())
-                    {
-                        rx += mdx * sensitivityScale() / (1500.0f * dt);
-                        ry += mdy * sensitivityScale() / (1500.0f * dt);
-                    }
                 }
             }
 
@@ -772,11 +918,11 @@ namespace lcs_input
                 static uint32_t aimLogReads = 0;
                 if (aimLog && m == 11u && (std::fabs(lx) + std::fabs(ly) + std::fabs(rx) + std::fabs(ry) > 0.05f) && ++aimLogReads % 10u == 0u)
                     std::fprintf(stderr, "[lcs-aim] mode 11 sticks: left %.2f %.2f right %.2f %.2f, mouse %.0f %.0f, %s\n", lx, ly, rx,
-                                 ry, mdx, mdy, padUsed ? "gamepad" : "keyboard/mouse");
+                                 ry, mdx, mdy, device == kGamepad ? "gamepad" : "keyboard/mouse");
                 if (aimLog && (m != lastM || aimBits != lastAim))
                 {
                     std::fprintf(stderr, "[lcs-aim] camera mode %u, buttons %04X (R1 %d L3 %d), %s\n", m, btn,
-                                 (btn & PAD_R1) ? 1 : 0, (btn & PAD_L3) ? 1 : 0, padUsed ? "gamepad" : "keyboard/mouse");
+                                 (btn & PAD_R1) ? 1 : 0, (btn & PAD_L3) ? 1 : 0, device == kGamepad ? "gamepad" : "keyboard/mouse");
                     lastM = m;
                     lastAim = aimBits;
                 }
@@ -800,6 +946,9 @@ namespace lcs_input
             return;
         }
         g_runtime = &runtime;
+        g_origProcessCamera = runtime.lookupFunction(kProcessCamera);
+        if (g_origProcessCamera)
+            runtime.replaceFunction(kProcessCamera, &processCamera);
         PSPadBackend::setReader(&reader);
         if (std::getenv("LCS_FREEAIM") == nullptr || std::getenv("LCS_FREEAIM")[0] != '0')
         {
@@ -994,7 +1143,7 @@ namespace lcs_input
                  {"ENTER + EXIT:", keys({&v.enterExit})}, {"NEXT RADIO STATION:", keys({&v.nextRadio})},
                  {"HORN:", keys({&v.horn})}, {"SUB-MISSION:", keys({&v.subMission})}, {"CHANGE CAMERA:", keys({&v.camera})},
                  {"HANDBRAKE:", keys({&v.handbrake})}, {"LOOK LEFT / RIGHT:", keys({&v.lookLeft, &v.lookRight})},
-                 {"LOOK BEHIND:", keys({&v.lookBehind})}, {"MOUSE LOOK:", keys({&v.mouseLook})}};
+                 {"LOOK BEHIND:", keys({&v.lookBehind})}, {"MOUSE LOOK:", "MOUSE"}};
         }
         const int n = std::min(max, static_cast<int>(l.size()));
         for (int i = 0; i < n; ++i)
@@ -1017,5 +1166,12 @@ namespace lcs_input
     bool invertMouse() { return false; }
     void setInvertMouse(bool) {}
     int bindingLines(bool, const char **, const char **, int) { return 0; }
+#endif
+}
+
+void lcsVehicleCameraBeforeCollision(uint8_t *ram, uint32_t cam, uint32_t target)
+{
+#if LCS_MENU_VIDEO
+    lcs_input::vehicleMouseView(ram, cam & PS2_RAM_MASK, target & PS2_RAM_MASK);
 #endif
 }

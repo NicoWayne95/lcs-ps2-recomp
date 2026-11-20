@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace present
@@ -244,7 +245,19 @@ namespace present
 
     rhi::Device::PresentMode g_presentMode = rhi::Device::PresentMode::Immediate;
 
-    void setPresentMode(int mode) { g_presentMode = static_cast<rhi::Device::PresentMode>(mode); }
+    void setPresentMode(int mode)
+    {
+        const char *overrideMode = std::getenv("LCS_PROFILE_PRESENT");
+        if (overrideMode && std::string_view(overrideMode) == "tearing")
+            mode = 2;
+        else if (overrideMode && std::string_view(overrideMode) == "vsync")
+            mode = 1;
+        else if (overrideMode && std::string_view(overrideMode) == "immediate")
+            mode = 0;
+        g_presentMode = static_cast<rhi::Device::PresentMode>(mode);
+        if (overrideMode)
+            std::fprintf(stderr, "[present] profiling override: mode %d\n", mode);
+    }
 
     // [lcs] LCS_PRESENT_CSV=<file>: every present as a CSV row - host ms since the first present, the interval since the
     // one before, how long Present itself took (vsync / a full queue blocks there). Fully buffered, written out by the

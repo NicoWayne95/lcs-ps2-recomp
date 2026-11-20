@@ -198,6 +198,7 @@ namespace platform
     // The cursor in drawable pixels from the window's top-left (windowSize's units); false while it is not over the
     // window, the mouse is captured or the window is hidden.
     bool mousePosition(float &x, float &y);
+    uint64_t gamepadActivitySerial(); // advances on a button press or an axis crossing its activation threshold
     bool gamepadConnected();
     bool gamepadButton(GamepadButton button);
     float gamepadAxis(GamepadAxis axis);
@@ -214,6 +215,8 @@ namespace platform
         Other,
     };
     GamepadFamily gamepadFamily();
+    enum class PlayStationModel { Unknown, DualShock2, DualShock3, DualShock4, DualSense };
+    PlayStationModel playStationModel();
     // Vibration, motors 0..1 (low = the large, slow motor; high = the small, fast one). Any thread; applied at the next
     // pumpEvents and held until changed (0, 0 stops).
     void gamepadRumble(float low, float high);

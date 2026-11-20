@@ -1,0 +1,580 @@
+{
+ "comment": "Remaining edits of generated/ee after tools/lcs_postprocess.py fixes and sync_generated (2026-11-17): time-step patches, extra resume labels, registrations, diagnostics.",
+ "edits": [
+  {
+   "file": "ps2_recompiled_functions.h",
+   "original": "#include <cstdint>\n",
+   "replacement": "#include <cstdint>\n#include \"ps2_guest_cc.h\"\n"
+  },
+  {
+   "file": "ps2_recompiled_stubs.h",
+   "original": "PS2_GUEST_CC void sub_003810F8_0x3810f8(uint8_t* rdram, R5900Context* ctx, PS2Runtime* runtime);\nPS2_GUEST_CC void sub_00381C90_0x381c90(uint8_t* rdram, R5900Context* ctx, PS2Runtime* runtime);",
+   "replacement": "PS2_GUEST_CC void sub_003810F8_0x3810f8(uint8_t* rdram, R5900Context* ctx, PS2Runtime* runtime);\nPS2_GUEST_CC void sub_00381918_0x381918(uint8_t* rdram, R5900Context* ctx, PS2Runtime* runtime);\nPS2_GUEST_CC void sub_003819F8_0x3819f8(uint8_t* rdram, R5900Context* ctx, PS2Runtime* runtime);\nPS2_GUEST_CC void sub_00381C90_0x381c90(uint8_t* rdram, R5900Context* ctx, PS2Runtime* runtime);"
+  },
+  {
+   "file": "ps2_recompiled_stubs.h",
+   "original": "#include <cstdint>\n#include \"ps2_runtime.h\"",
+   "replacement": "#include <cstdint>\n#include \"ps2_guest_cc.h\"\n#include \"ps2_runtime.h\""
+  },
+  {
+   "file": "register_functions.cpp",
+   "original": "        g_ps2RecompiledFunctionTable[499070] = sub_002E75D8_0x2e75d8; // 0x2e75f8\n        g_ps2RecompiledFunctionTable[499082] = sub_002E7628_0x2e7628; // 0x2e7628",
+   "replacement": "        g_ps2RecompiledFunctionTable[499070] = sub_002E75D8_0x2e75d8; // 0x2e75f8\n        g_ps2RecompiledFunctionTable[499074] = sub_002E75D8_0x2e75d8; // 0x2e7608\n        g_ps2RecompiledFunctionTable[499082] = sub_002E7628_0x2e7628; // 0x2e7628"
+  },
+  {
+   "file": "register_functions.cpp",
+   "original": "        g_ps2RecompiledFunctionTable[335972] = sub_00248190_0x248190; // 0x248190\n        g_ps2RecompiledFunctionTable[335976] = sub_00248190_0x248190; // 0x2481a0",
+   "replacement": "        g_ps2RecompiledFunctionTable[335972] = sub_00248190_0x248190; // 0x248190\n        g_ps2RecompiledFunctionTable[335973] = sub_00248190_0x248190; // 0x248194\n        g_ps2RecompiledFunctionTable[335976] = sub_00248190_0x248190; // 0x2481a0"
+  },
+  {
+   "file": "sub_00127458_0x127458.cpp",
+   "original": "    ctx->pc = 0x127508u;\n    SET_GPR_S32(ctx, 1, (int32_t)((uint32_t)16128 << 16));\n    // 0x12750c: 0x44811000  mtc1        $at, $f2",
+   "replacement": "    ctx->pc = 0x127508u;\n    SET_GPR_U32(ctx, 1, lcsTimeStepLowBits()); // [lcs] was lui $at, 0x3F00 (0.5): CTimer step floor\n    // 0x12750c: 0x44811000  mtc1        $at, $f2"
+  },
+  {
+   "file": "sub_00127458_0x127458.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsTimeStepFloorBits(); // [lcs] src/lcs/lcs_timestep.cpp\nuint32_t lcsTimeStepLowBits();\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_001574E8_0x1574e8.cpp",
+   "original": "    ctx->pc = 0x157584u;\n    SET_GPR_S32(ctx, 1, (int32_t)((uint32_t)16128 << 16));\n    // 0x157588: 0x44810800  mtc1        $at, $f1",
+   "replacement": "    ctx->pc = 0x157584u;\n    SET_GPR_U32(ctx, 1, lcsTimeStepLowBits()); // [lcs] was lui $at, 0x3F00 (0.5): CTimer step floor\n    // 0x157588: 0x44810800  mtc1        $at, $f1"
+  },
+  {
+   "file": "sub_001574E8_0x1574e8.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsTimeStepFloorBits(); // [lcs] src/lcs/lcs_timestep.cpp\nuint32_t lcsTimeStepLowBits();\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_00159000_0x159000.cpp",
+   "original": "    ctx->pc = 0x15bbe0u;\n    SET_GPR_S32(ctx, 1, (int32_t)((uint32_t)16128 << 16));\nlabel_15bbe4:",
+   "replacement": "    ctx->pc = 0x15bbe0u;\n    SET_GPR_U32(ctx, 1, lcsTimeStepLowBits()); // [lcs] was lui $at, 0x3F00 (0.5): CTimer step floor\nlabel_15bbe4:"
+  },
+  {
+   "file": "sub_00159000_0x159000.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsTimeStepFloorBits(); // [lcs] src/lcs/lcs_timestep.cpp\nuint32_t lcsTimeStepLowBits();\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_0016F8D8_0x16f8d8.cpp",
+   "original": "        // 0x170464: 0xa6020016  sh          $v0, 0x16($s0) (Delay Slot)\n        WRITE16(ADD32(GPR_U32(ctx, 16), 22), (uint16_t)GPR_U32(ctx, 2));\n        ctx->in_delay_slot = false;",
+   "replacement": "        // 0x170464: 0xa6020016  sh          $v0, 0x16($s0) (Delay Slot)\n        static const bool modernPad = [] {\n            const char *profile = std::getenv(\"LCS_CONTROLLER_PROFILE\");\n            return profile && std::strcmp(profile, \"modern\") == 0;\n        }();\n        const uint16_t pressure = modernPad ? READ8(ADD32(GPR_U32(ctx, 29), 31)) : 0;\n        WRITE16(ADD32(GPR_U32(ctx, 16), 22), pressure ? pressure : (uint16_t)GPR_U32(ctx, 2));\n        ctx->in_delay_slot = false;"
+  },
+  {
+   "file": "sub_0016F8D8_0x16f8d8.cpp",
+   "original": "        // 0x17044c: 0xa6020014  sh          $v0, 0x14($s0) (Delay Slot)\n        WRITE16(ADD32(GPR_U32(ctx, 16), 20), (uint16_t)GPR_U32(ctx, 2));\n        ctx->in_delay_slot = false;",
+   "replacement": "        // 0x17044c: 0xa6020014  sh          $v0, 0x14($s0) (Delay Slot)\n        static const bool modernPad = [] {\n            const char *profile = std::getenv(\"LCS_CONTROLLER_PROFILE\");\n            return profile && std::strcmp(profile, \"modern\") == 0;\n        }();\n        const uint16_t pressure = modernPad ? READ8(ADD32(GPR_U32(ctx, 29), 30)) : 0;\n        WRITE16(ADD32(GPR_U32(ctx, 16), 20), pressure ? pressure : (uint16_t)GPR_U32(ctx, 2));\n        ctx->in_delay_slot = false;"
+  },
+  {
+   "file": "sub_0016F8D8_0x16f8d8.cpp",
+   "original": "#include <stdexcept>",
+   "replacement": "#include <cstdlib>\n#include <cstring>\n#include <stdexcept>"
+  },
+  {
+   "file": "sub_0017ECA0_0x17eca0.cpp",
+   "original": "    ctx->pc = 0x180d4cu;\n    SET_GPR_S32(ctx, 1, (int32_t)((uint32_t)16128 << 16));\nlabel_180d50:",
+   "replacement": "    ctx->pc = 0x180d4cu;\n    SET_GPR_U32(ctx, 1, lcsTimeStepLowBits()); // [lcs] was lui $at, 0x3F00 (0.5): CTimer step floor\nlabel_180d50:"
+  },
+  {
+   "file": "sub_0017ECA0_0x17eca0.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsTimeStepFloorBits(); // [lcs] src/lcs/lcs_timestep.cpp\nuint32_t lcsTimeStepLowBits();\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_00191F88_0x191f88.cpp",
+   "original": "    ctx->pc = 0x191fa4u;\n    SET_GPR_S32(ctx, 2, (int32_t)READ32(ADD32(GPR_U32(ctx, 19), 20)));",
+   "replacement": "    ctx->pc = 0x191fa4u;\n    {\n        static unsigned samples = 0;\n        static unsigned invalid = 0;\n        const auto object = GPR_U32(ctx, 19);\n        const auto address = ADD32(object, 20);\n        const bool suspect = address >= 0x02000000u || address < 0x1000u || (address & 3u);\n        if (samples++ < 8 || (suspect && invalid++ < 16)) {\n            std::fprintf(stderr, \"[post-taxi callback] caller=%08x object=%08x read=%08x sp=%08x\\n\",\n                GPR_U32(ctx, 31), object, address, GPR_U32(ctx, 29));\n        }\n    }\n    SET_GPR_S32(ctx, 2, (int32_t)READ32(ADD32(GPR_U32(ctx, 19), 20)));"
+  },
+  {
+   "file": "sub_00191F88_0x191f88.cpp",
+   "original": "#include <stdexcept>",
+   "replacement": "#include <cstdio>\n#include <stdexcept>"
+  },
+  {
+   "file": "sub_001D5830_0x1d5830.cpp",
+   "original": "    ctx->pc = 0x1d5978u;\n    SET_GPR_S32(ctx, 1, (int32_t)((uint32_t)16128 << 16));\n    // 0x1d597c: 0x44811800  mtc1        $at, $f3",
+   "replacement": "    ctx->pc = 0x1d5978u;\n    SET_GPR_U32(ctx, 1, lcsTimeStepPedBits()); // [lcs] was lui $at, 0x3F00 (0.5): CTimer step floor\n    // 0x1d597c: 0x44811800  mtc1        $at, $f3"
+  },
+  {
+   "file": "sub_001D5830_0x1d5830.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsTimeStepFloorBits(); // [lcs] src/lcs/lcs_timestep.cpp\nuint32_t lcsTimeStepLowBits();\nuint32_t lcsTimeStepPedBits();\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_001D6F30_0x1d6f30.cpp",
+   "original": "    ctx->pc = 0x1d9388u;\n    SET_GPR_S32(ctx, 1, (int32_t)((uint32_t)16128 << 16));\nlabel_1d938c:",
+   "replacement": "    ctx->pc = 0x1d9388u;\n    SET_GPR_U32(ctx, 1, lcsTimeStepLowBits()); // [lcs] was lui $at, 0x3F00 (0.5): CTimer step floor\nlabel_1d938c:"
+  },
+  {
+   "file": "sub_001D6F30_0x1d6f30.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsTimeStepFloorBits(); // [lcs] src/lcs/lcs_timestep.cpp\nuint32_t lcsTimeStepLowBits();\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_001FD758_0x1fd758.cpp",
+   "original": "    {\n        const bool branch_taken_0x1fd938 = (GPR_S64(ctx, 2) <= 0);\n        ctx->pc = 0x1FD93Cu;",
+   "replacement": "    {\n        const bool branch_taken_0x1fd938 = (GPR_S32(ctx, 2) <= 0);\n        ctx->pc = 0x1FD93Cu;"
+  },
+  {
+   "file": "sub_0022E3B8_0x22e3b8.cpp",
+   "original": "        if (branch_taken_0x22e4b8) {\n            ctx->pc = 0x22E460u;",
+   "replacement": "        if (branch_taken_0x22e4b8) {\n            ++repeatCount;\n            if (repeatCount >= 1024u && (repeatCount & (repeatCount - 1u)) == 0u)\n            {\n                const uint32_t savedRa = READ32(ADD32(GPR_U32(ctx, 29), 40));\n                std::fprintf(stderr, \"[lcs-anim] iterations=%llu caller-ra=0x%08x state=0x%08x \"\n                                     \"key=0x%08x end=0x%08x stride=%u remaining=%g duration=%g\\n\",\n                             static_cast<unsigned long long>(repeatCount), savedRa, GPR_U32(ctx, 17),\n                             GPR_U32(ctx, 16), GPR_U32(ctx, 20), GPR_U32(ctx, 18),\n                             static_cast<double>(ctx->f[20]), static_cast<double>(ctx->f[0]));\n            }\n            ctx->pc = 0x22E460u;"
+  },
+  {
+   "file": "sub_0022E3B8_0x22e3b8.cpp",
+   "original": "    // 0x22e3b8: 0x27bdffc0  addiu       $sp, $sp, -0x40\n    ctx->pc = 0x22e3b8u;",
+   "replacement": "    // 0x22e3b8: 0x27bdffc0  addiu       $sp, $sp, -0x40\n    repeatCount = 0;\n    ctx->pc = 0x22e3b8u;"
+  },
+  {
+   "file": "sub_0022E3B8_0x22e3b8.cpp",
+   "original": "    }\n\n    ctx->pc = 0x22e3b8u;\n",
+   "replacement": "    }\n\n    repeatCount = 0;\n    ctx->pc = 0x22e3b8u;\n"
+  },
+  {
+   "file": "sub_0022E3B8_0x22e3b8.cpp",
+   "original": "\n    switch (ctx->pc) {",
+   "replacement": "\n    static thread_local uint64_t repeatCount = 0;\n\n    switch (ctx->pc) {"
+  },
+  {
+   "file": "sub_0022E3B8_0x22e3b8.cpp",
+   "original": "#include <stdexcept>\n#include \"ps2_runtime_macros.h\"",
+   "replacement": "#include <stdexcept>\n#include <cstdio>\n#include \"ps2_runtime_macros.h\""
+  },
+  {
+   "file": "sub_00248170_0x248170.cpp",
+   "original": "        const bool branch_taken_0x24818c = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0));\n        if (branch_taken_0x24818c) {",
+   "replacement": "        const bool branch_taken_0x24818c = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0));\n        ctx->pc = 0x248190u;\n        ctx->in_delay_slot = true;\n        ctx->branch_pc = 0x24818cu;\n        WRITE64(ADD32(GPR_U32(ctx, 29), 32), GPR_U64(ctx, 31));\n        ctx->in_delay_slot = false;\n        if (branch_taken_0x24818c) {"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248cd4 = (GPR_S64(ctx, 3) >= 0);\n        ctx->pc = 0x248CD8u;",
+   "replacement": "    {\n        const bool branch_taken_0x248cd4 = (GPR_S32(ctx, 3) >= 0);\n        ctx->pc = 0x248CD8u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248c88 = (GPR_S64(ctx, 4) >= 0);\n        ctx->pc = 0x248C8Cu;",
+   "replacement": "    {\n        const bool branch_taken_0x248c88 = (GPR_S32(ctx, 4) >= 0);\n        ctx->pc = 0x248C8Cu;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248b74 = (GPR_S64(ctx, 3) >= 0);\n        ctx->pc = 0x248B78u;",
+   "replacement": "    {\n        const bool branch_taken_0x248b74 = (GPR_S32(ctx, 3) >= 0);\n        ctx->pc = 0x248B78u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248b28 = (GPR_S64(ctx, 4) >= 0);\n        ctx->pc = 0x248B2Cu;",
+   "replacement": "    {\n        const bool branch_taken_0x248b28 = (GPR_S32(ctx, 4) >= 0);\n        ctx->pc = 0x248B2Cu;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x2489ec = (GPR_S64(ctx, 3) >= 0);\n        ctx->pc = 0x2489F0u;",
+   "replacement": "    {\n        const bool branch_taken_0x2489ec = (GPR_S32(ctx, 3) >= 0);\n        ctx->pc = 0x2489F0u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x2489a0 = (GPR_S64(ctx, 4) >= 0);\n        ctx->pc = 0x2489A4u;",
+   "replacement": "    {\n        const bool branch_taken_0x2489a0 = (GPR_S32(ctx, 4) >= 0);\n        ctx->pc = 0x2489A4u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248864 = (GPR_S64(ctx, 3) >= 0);\n        ctx->pc = 0x248868u;",
+   "replacement": "    {\n        const bool branch_taken_0x248864 = (GPR_S32(ctx, 3) >= 0);\n        ctx->pc = 0x248868u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248818 = (GPR_S64(ctx, 4) >= 0);\n        ctx->pc = 0x24881Cu;",
+   "replacement": "    {\n        const bool branch_taken_0x248818 = (GPR_S32(ctx, 4) >= 0);\n        ctx->pc = 0x24881Cu;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x2486dc = (GPR_S64(ctx, 3) >= 0);\n        ctx->pc = 0x2486E0u;",
+   "replacement": "    {\n        const bool branch_taken_0x2486dc = (GPR_S32(ctx, 3) >= 0);\n        ctx->pc = 0x2486E0u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248690 = (GPR_S64(ctx, 4) >= 0);\n        ctx->pc = 0x248694u;",
+   "replacement": "    {\n        const bool branch_taken_0x248690 = (GPR_S32(ctx, 4) >= 0);\n        ctx->pc = 0x248694u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248564 = (GPR_S64(ctx, 3) >= 0);\n        ctx->pc = 0x248568u;",
+   "replacement": "    {\n        const bool branch_taken_0x248564 = (GPR_S32(ctx, 3) >= 0);\n        ctx->pc = 0x248568u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x248518 = (GPR_S64(ctx, 4) >= 0);\n        ctx->pc = 0x24851Cu;",
+   "replacement": "    {\n        const bool branch_taken_0x248518 = (GPR_S32(ctx, 4) >= 0);\n        ctx->pc = 0x24851Cu;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    {\n        const bool branch_taken_0x2481e4 = (GPR_S64(ctx, 3) <= 0);\n        ctx->pc = 0x2481E8u;",
+   "replacement": "    {\n        const bool branch_taken_0x2481e4 = (GPR_S32(ctx, 3) <= 0);\n        ctx->pc = 0x2481E8u;"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    WRITE64(ADD32(GPR_U32(ctx, 29), 32), GPR_U64(ctx, 31));\n    // 0x248194: 0x2404000a  addiu       $a0, $zero, 0xA",
+   "replacement": "    WRITE64(ADD32(GPR_U32(ctx, 29), 32), GPR_U64(ctx, 31));\nlabel_248194:\n    // 0x248194: 0x2404000a  addiu       $a0, $zero, 0xA"
+  },
+  {
+   "file": "sub_00248190_0x248190.cpp",
+   "original": "    switch (ctx->pc) {\n        case 0x2481a0u: goto label_2481a0;",
+   "replacement": "    switch (ctx->pc) {\n        case 0x248194u: goto label_248194;\n        case 0x2481a0u: goto label_2481a0;"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "label_2a0bfc:\n    // 0x2a0bfc: 0x8f820188  lw          $v0, 0x188($gp)",
+   "replacement": "label_2a0bfc:\n    if (setupAt)\n    {\n        lcs::rslworld::checkLcsFlushSetup(rdram, 0x0400u, setupAt, expectedSetup);\n        setupAt = 0;\n    }\n    if (lcs::rslworld::emitLcsFlushSetup200(rdram, ctx, runtime))\n        goto label_2a0d7c;\n    // 0x2a0bfc: 0x8f820188  lw          $v0, 0x188($gp)"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "label_2a0a98:\n    // 0x2a0a98: 0x3c0a003a  lui         $t2, 0x3A",
+   "replacement": "label_2a0a98:\n    if (lcs::rslworld::emitLcsFlushSetup(rdram, ctx, runtime, 0x0400u))\n        goto label_2a0bfc;\n    setupAt = lcs::rslworld::captureLcsFlushSetup(rdram, 0x0400u, expectedSetup);\n    // 0x2a0a98: 0x3c0a003a  lui         $t2, 0x3A"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "label_2a0a88:\n    // 0x2a0a88: 0x8f820188  lw          $v0, 0x188($gp)",
+   "replacement": "label_2a0a88:\n    if (setupAt)\n    {\n        lcs::rslworld::checkLcsFlushSetup(rdram, 0x0800u, setupAt, expectedSetup);\n        setupAt = 0;\n    }\n    // 0x2a0a88: 0x8f820188  lw          $v0, 0x188($gp)"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "label_2a0914:\n    // 0x2a0914: 0x3c071000  lui         $a3, 0x1000",
+   "replacement": "label_2a0914:\n    if (lcs::rslworld::emitLcsFlushSetup(rdram, ctx, runtime, 0x0800u))\n        goto label_2a0a88;\n    setupAt = lcs::rslworld::captureLcsFlushSetup(rdram, 0x0800u, expectedSetup);\n    // 0x2a0914: 0x3c071000  lui         $a3, 0x1000"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "        const bool branch_taken_0x2a039c = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0));\n        if (branch_taken_0x2a039c) {",
+   "replacement": "        const bool branch_taken_0x2a039c = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0));\n        if (!branch_taken_0x2a039c)\n            callbackIterations = 0;\n        else if ((++callbackIterations & 0xFFFFu) == 0u)\n            std::fprintf(stderr, \"[lcs-flush] callback ring at 0x2A0378: iterations=%llu node=0x%08x head=0x%08x\\n\",\n                         callbackIterations, static_cast<unsigned>(GPR_U32(ctx, 16)),\n                         static_cast<unsigned>(GPR_U32(ctx, 17)));\n        if (branch_taken_0x2a039c) {"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "    {\n        const bool branch_taken_0x2a039c = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0));",
+   "replacement": "    {\n        static thread_local unsigned long long callbackIterations = 0;\n        const bool branch_taken_0x2a039c = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0));"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "\n    switch (ctx->pc) {",
+   "replacement": "\n    uint32_t setupAt = 0;\n    uint64_t expectedSetup[28];\n    switch (ctx->pc) {"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "\n// Function: sub_002A02F0",
+   "replacement": "\nnamespace lcs::rslworld\n{\n    uint32_t captureLcsFlushSetup(uint8_t *rdram, uint32_t flag, uint64_t *expected);\n    void checkLcsFlushSetup(uint8_t *rdram, uint32_t flag, uint32_t at, const uint64_t *expected);\n    bool emitLcsFlushSetup(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime, uint32_t flag);\n    bool emitLcsFlushSetup200(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime);\n}\n\n// Function: sub_002A02F0"
+  },
+  {
+   "file": "sub_002A02F0_0x2a02f0.cpp",
+   "original": "#include <stdexcept>\n#include \"ps2_runtime_macros.h\"",
+   "replacement": "#include <stdexcept>\n#include <cstdio>\n#include \"ps2_runtime_macros.h\""
+  },
+  {
+   "file": "sub_002B4CF8_0x2b4cf8.cpp",
+   "original": "    do { uint32_t _value = static_cast<uint32_t>(GPR_U32(ctx, 2)); ps2TraceGuestWrite(rdram, 0x3D9B6Cu, 4u, _value, 0u, \"WRITE32\", ctx); FAST_WRITE32(0x3D9B6Cu, _value); } while (0);\n    // 0x2b4fbc: 0x3e00008  jr          $ra",
+   "replacement": "    do { uint32_t _value = static_cast<uint32_t>(GPR_U32(ctx, 2)); ps2TraceGuestWrite(rdram, 0x3D9B6Cu, 4u, _value, 0u, \"WRITE32\", ctx); FAST_WRITE32(0x3D9B6Cu, _value); } while (0);\n    {\n        const uint32_t stepBits = FAST_READ32(0x3D9B8Cu);\n        const uint32_t scaleBits = FAST_READ32(0x3D9CE4u);\n        const uint32_t rawBits = READ32(ADD32(GPR_U32(ctx, 28), 11948));\n        float step, scale, unclipped;\n        std::memcpy(&step, &stepBits, sizeof(step));\n        std::memcpy(&scale, &scaleBits, sizeof(scale));\n        std::memcpy(&unclipped, &rawBits, sizeof(unclipped));\n        lcsTraceTiming(runtime, FAST_READ32(0x3D9B70u),\n                       static_cast<int32_t>(FAST_READ32(0x3DA0D8u)), step, unclipped, scale);\n    }\n    // 0x2b4fbc: 0x3e00008  jr          $ra"
+  },
+  {
+   "file": "sub_002B4CF8_0x2b4cf8.cpp",
+   "original": "    ctx->pc = 0x2b4ec0u;\n    SET_GPR_S32(ctx, 1, (int32_t)((uint32_t)16128 << 16));\n    // 0x2b4ec4: 0x44810800  mtc1        $at, $f1",
+   "replacement": "    ctx->pc = 0x2b4ec0u;\n    SET_GPR_U32(ctx, 1, lcsTimeStepFloorBits()); // [lcs] was lui $at, 0x3F00 (0.5): CTimer step floor\n    // 0x2b4ec4: 0x44810800  mtc1        $at, $f1"
+  },
+  {
+   "file": "sub_002B4CF8_0x2b4cf8.cpp",
+   "original": "label_2b4d14:\n    // 0x2b4d14: 0xdf8403e0  ld          $a0, 0x3E0($gp)",
+   "replacement": "label_2b4d14:\n    SET_GPR_U64(ctx, 2, lcsSelectCTimerTicks(GPR_U64(ctx, 2)));\n    // 0x2b4d14: 0xdf8403e0  ld          $a0, 0x3E0($gp)"
+  },
+  {
+   "file": "sub_002B4CF8_0x2b4cf8.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\n\nuint64_t lcsSelectCTimerTicks(uint64_t guestTicks);\nvoid lcsTraceTiming(PS2Runtime *, uint32_t, int32_t, float, float, float);\nuint32_t lcsTimeStepFloorBits(); // [lcs] src/lcs/lcs_timestep.cpp\nuint32_t lcsTimeStepLowBits();\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_002E3FF0_0x2e3ff0.cpp",
+   "original": "    ctx->pc = 0x2E401Cu;\nlabel_2e401c:",
+   "replacement": "    ctx->pc = 0x2E401Cu;\n    SET_GPR_S32(ctx, 2, lcsOnscreenTimerMs(ctx->f[12])); // [lcs] was (int)(step * 20): keep the fraction (lcs_timestep.cpp)\nlabel_2e401c:"
+  },
+  {
+   "file": "sub_002E3FF0_0x2e3ff0.cpp",
+   "original": "#include \"ps2_log.h\"\n#endif\n\n// Function: sub_002E3FF0",
+   "replacement": "#include \"ps2_log.h\"\n#endif\nint32_t lcsOnscreenTimerMs(float ms); // [lcs] src/lcs/lcs_timestep.cpp\n\n// Function: sub_002E3FF0"
+  },
+  {
+   "file": "sub_002E75D8_0x2e75d8.cpp",
+   "original": "    // NOP\n    // 0x2e7608: 0x3c030044  lui         $v1, 0x44",
+   "replacement": "    // NOP\nlabel_2e7608:\n    // 0x2e7608: 0x3c030044  lui         $v1, 0x44"
+  },
+  {
+   "file": "sub_002E75D8_0x2e75d8.cpp",
+   "original": "        case 0x2e75f8u: goto label_2e75f8;\n        default: break;",
+   "replacement": "        case 0x2e75f8u: goto label_2e75f8;\n        case 0x2e7608u: goto label_2e7608; // LCS: JALR-Ziel aus 0x2e77b8\n        default: break;"
+  },
+  {
+   "file": "sub_0031E820_0x31e820.cpp",
+   "original": "    ctx->pc = 0x31e858u;\n    SET_GPR_S32(ctx, 16, (int32_t)READ32(ADD32(GPR_U32(ctx, 2), 0)));",
+   "replacement": "    ctx->pc = 0x31e858u;\n    if (GPR_U32(ctx, 20) == 0x00191F88u) {\n        static unsigned samples = 0;\n        const auto node = GPR_U32(ctx, 2);\n        if (samples++ < 12) {\n            std::fprintf(stderr, \"[post-taxi list] caller=%08x list=%08x head=%08x node=%08x object=%08x\\n\",\n                GPR_U32(ctx, 31), GPR_U32(ctx, 17), GPR_U32(ctx, 18), node, GPR_U32(ctx, 4));\n        }\n    }\n    SET_GPR_S32(ctx, 16, (int32_t)READ32(ADD32(GPR_U32(ctx, 2), 0)));"
+  },
+  {
+   "file": "sub_0031E820_0x31e820.cpp",
+   "original": "#include <stdexcept>",
+   "replacement": "#include <cstdio>\n#include <stdexcept>"
+  },
+  {
+   "file": "sub_003819F8_0x3819f8.cpp",
+   "original": "    {\n        const bool branch_taken_0x381b74 = (GPR_S64(ctx, 2) >= 0);\n        ctx->pc = 0x381B78u;",
+   "replacement": "    {\n        const bool branch_taken_0x381b74 = (GPR_S32(ctx, 2) >= 0);\n        ctx->pc = 0x381B78u;"
+  },
+  {
+   "file": "sub_003819F8_0x3819f8.cpp",
+   "original": "    {\n        const bool branch_taken_0x381abc = (GPR_S64(ctx, 2) < 0);\n        ctx->pc = 0x381AC0u;",
+   "replacement": "    {\n        const bool branch_taken_0x381abc = (GPR_S32(ctx, 2) < 0);\n        ctx->pc = 0x381AC0u;"
+  },
+  {
+   "file": "sub_002B7428_0x2b7428.cpp",
+   "original": "    ctx->pc = 0x2b75a8u;\n    SET_GPR_S32(ctx, 1, (int32_t)((uint32_t)16128 << 16));\n    // 0x2b75ac: 0x44810000  mtc1        $at, $f0",
+   "replacement": "    ctx->pc = 0x2b75a8u;\n    SET_GPR_U32(ctx, 1, lcsTimeStepPedBits()); // [lcs] was lui $at, 0x3F00 (0.5): CCutsceneObject speed *2 below it\n    // 0x2b75ac: 0x44810000  mtc1        $at, $f0"
+  },
+  {
+   "file": "sub_002B7428_0x2b7428.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsTimeStepPedBits(); // [lcs] src/lcs/lcs_timestep.cpp\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_0014F2F8_0x14f2f8.cpp",
+   "original": "    ctx->pc = 0x14f330u;\n    SET_GPR_U64(ctx, 5, GPR_U64(ctx, 5) | (uint64_t)(uint16_t)57344);",
+   "replacement": "    ctx->pc = 0x14f330u;\n    SET_GPR_U64(ctx, 5, GPR_U64(ctx, 5) | (uint64_t)(uint16_t)57344);\n    SET_GPR_U32(ctx, 5, lcsMainHeapReserve(GPR_U32(ctx, 5))); // [lcs] 64 MB: no reserve for the second heap"
+  },
+  {
+   "file": "sub_0014F2F8_0x14f2f8.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsMainHeapReserve(uint32_t reserve); // [lcs] src/lcs/lcs_memory.cpp\nuint32_t lcsHeapRoomEnd();\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_00331D78_0x331d78.cpp",
+   "original": "    ctx->pc = 0x331dc8u;\n    SET_GPR_S32(ctx, 16, (int32_t)SUB32(GPR_U32(ctx, 16), GPR_U32(ctx, 5)));",
+   "replacement": "    ctx->pc = 0x331dc8u;\n    SET_GPR_S32(ctx, 16, (int32_t)SUB32(GPR_U32(ctx, 16), GPR_U32(ctx, 5)));\n    { uint32_t start = GPR_U32(ctx, 18), size = GPR_U32(ctx, 16); lcsSecondHeapLayout(start, size); SET_GPR_U32(ctx, 18, start); SET_GPR_U32(ctx, 16, size); } // [lcs] 64 MB: above the stack"
+  },
+  {
+   "file": "sub_00331D78_0x331d78.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nvoid lcsSecondHeapLayout(uint32_t &start, uint32_t &size); // [lcs] src/lcs/lcs_memory.cpp\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_0014F2F8_0x14f2f8.cpp",
+   "original": "    ctx->pc = 0x14f318u;\n    SET_GPR_S32(ctx, 2, (int32_t)((uint32_t)510 << 16));",
+   "replacement": "    ctx->pc = 0x14f318u;\n    SET_GPR_U32(ctx, 2, lcsHeapRoomEnd()); // [lcs] was lui $v0, 0x1FE: the heaps' room ends below the main stack"
+  },
+  {
+   "file": "sub_001C6A60_0x1c6a60.cpp",
+   "original": "    ctx->pc = 0x1c6bf4u;\n    SET_GPR_S32(ctx, 5, (int32_t)((uint32_t)510 << 16));",
+   "replacement": "    ctx->pc = 0x1c6bf4u;\n    SET_GPR_U32(ctx, 5, lcsHeapRoomEnd()); // [lcs] was lui $a1, 0x1FE: SetupThread's stack (0x20000 bytes) right above the heaps' room"
+  },
+  {
+   "file": "sub_001C6A60_0x1c6a60.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsHeapRoomEnd(); // [lcs] src/lcs/lcs_memory.cpp\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_0027C088_0x27c088.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nvoid lcsVehicleCameraBeforeCollision(uint8_t *ram, uint32_t cam, uint32_t target);\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_0027C088_0x27c088.cpp",
+   "original": "    ctx->pc = 0x27c2c8u;\n    { uint32_t bits = READ32(ADD32(GPR_U32(ctx, 16), 464)); float f; std::memcpy(&f, &bits, sizeof(f)); ctx->f[0] = f; }",
+   "replacement": "    ctx->pc = 0x27c2c8u;\n    lcsVehicleCameraBeforeCollision(rdram, GPR_U32(ctx, 16), GPR_U32(ctx, 16) + 0x160u);\n    { uint32_t bits = READ32(ADD32(GPR_U32(ctx, 16), 464)); float f; std::memcpy(&f, &bits, sizeof(f)); ctx->f[0] = f; }"
+  },
+  {
+   "file": "sub_00283EB8_0x283eb8.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nvoid lcsVehicleCameraBeforeCollision(uint8_t *ram, uint32_t cam, uint32_t target);\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_00283EB8_0x283eb8.cpp",
+   "original": "    ctx->pc = 0x28595cu;\n    SET_GPR_S32(ctx, 2, (int32_t)READ32(ADD32(GPR_U32(ctx, 18), 628)));",
+   "replacement": "    ctx->pc = 0x28595cu;\n    lcsVehicleCameraBeforeCollision(rdram, GPR_U32(ctx, 18), GPR_U32(ctx, 30));\n    SET_GPR_S32(ctx, 2, (int32_t)READ32(ADD32(GPR_U32(ctx, 18), 628)));"
+  },
+  {
+   "file": "sub_0023F438_0x23f438.cpp",
+   "original": "#include \"ps2_runtime.h\"\n#include <ps2_recompiled_functions.h>",
+   "replacement": "#include \"ps2_runtime.h\"\nuint32_t lcsWantedBlinkPhase(uint32_t original);\n#include <ps2_recompiled_functions.h>"
+  },
+  {
+   "file": "sub_0023F438_0x23f438.cpp",
+   "original": "    ctx->pc = 0x240b28u;\n    SET_GPR_U64(ctx, 2, GPR_U64(ctx, 2) & (uint64_t)(uint16_t)4);",
+   "replacement": "    ctx->pc = 0x240b28u;\n    SET_GPR_U32(ctx, 2, lcsWantedBlinkPhase(GPR_U32(ctx, 2) >> 2) << 2);"
+  },
+  {
+   "file": "sub_0023F438_0x23f438.cpp",
+   "original": "    ctx->pc = 0x240b64u;\n    SET_GPR_U64(ctx, 2, GPR_U64(ctx, 2) & (uint64_t)(uint16_t)4);",
+   "replacement": "    ctx->pc = 0x240b64u;\n    SET_GPR_U32(ctx, 2, lcsWantedBlinkPhase(GPR_U32(ctx, 2) >> 2) << 2);"
+  },
+  {
+   "file": "sub_00327C40_0x327c40.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nfloat lcsScaleRollingResistance(const uint8_t *rdram, float resistance);"
+  },
+  {
+   "file": "sub_00327C40_0x327c40.cpp",
+   "original": "    ctx->pc = 0x327fb8u;\n    { if (ctx->f[0] == 0.0f) ctx->fcr31 |= 0x100000; /* DZ flag */ ctx->f[23] = FPU_DIV_S(ctx->f[1], ctx->f[0]); }",
+   "replacement": "    ctx->pc = 0x327fb8u;\n    { if (ctx->f[0] == 0.0f) ctx->fcr31 |= 0x100000; /* DZ flag */ ctx->f[23] = FPU_DIV_S(ctx->f[1], ctx->f[0]); }\n    ctx->f[23] = lcsScaleRollingResistance(rdram, ctx->f[23]);"
+  },
+  {
+   "file": "sub_003285A8_0x3285a8.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nfloat lcsScaleRollingResistance(const uint8_t *rdram, float resistance);"
+  },
+  {
+   "file": "sub_003285A8_0x3285a8.cpp",
+   "original": "    ctx->pc = 0x32891cu;\n    { if (ctx->f[0] == 0.0f) ctx->fcr31 |= 0x100000; /* DZ flag */ ctx->f[23] = FPU_DIV_S(ctx->f[1], ctx->f[0]); }",
+   "replacement": "    ctx->pc = 0x32891cu;\n    { if (ctx->f[0] == 0.0f) ctx->fcr31 |= 0x100000; /* DZ flag */ ctx->f[23] = FPU_DIV_S(ctx->f[1], ctx->f[0]); }\n    ctx->f[23] = lcsScaleRollingResistance(rdram, ctx->f[23]);"
+  },
+  {
+   "file": "sub_001CD580_0x1cd580.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nbool lcsEffectTick30(const uint8_t *rdram);"
+  },
+  {
+   "file": "sub_001CE1B0_0x1ce1b0.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\n#include \"lcs/lcs_smoke_timing.h\"\nbool lcsEffectTick30(const uint8_t *rdram);\nfloat lcsSmokeExpansion(const uint8_t *rdram, float expansion);\nvoid lcsTraceTyreSmokeRemoval(const uint8_t *rdram, uint32_t particle);\nint lcsTyreSmokeFade(const uint8_t *rdram, uint32_t particle, int fade);"
+  },
+  {
+   "file": "sub_001CD580_0x1cd580.cpp",
+   "original": "    ctx->pc = 0x1cd580u;\n\n    // 0x1cd580:",
+   "replacement": "    {\n        const uint32_t caller = GPR_U32(ctx, 31);\n        const uint32_t type = GPR_U32(ctx, 4);\n        const bool exhaust = type == 65u &&\n            (caller == 0x1319DCu || caller == 0x131A14u || caller == 0x131A78u || caller == 0x131AB8u ||\n             caller == 0x1607CCu || caller == 0x1607F8u);\n        const bool wheel = (type == 66u || type == 67u) &&\n            ((caller >= 0x12FD58u && caller < 0x1319DCu) || (caller >= 0x15DEB8u && caller < 0x1607CCu));\n        const bool engine = (type == 33u || (type >= 55u && type <= 57u)) &&\n            ((caller >= 0x12A598u && caller <= 0x12AA64u) ||\n             caller == 0x12D24Cu || caller == 0x12D284u || caller == 0x12DFDCu ||\n             (caller >= 0x12F2C4u && caller <= 0x12F704u));\n        const bool wheelSparks = type == 1u &&\n            (caller == 0x130B60u || caller == 0x130BD0u || caller == 0x130C40u || caller == 0x130C90u ||\n             caller == 0x15F824u || caller == 0x15F890u || caller == 0x15F8DCu);\n        const bool wheelSpray = type == 38u && caller == 0x131714u;\n        if ((exhaust || wheel || engine || wheelSparks || wheelSpray) && !lcsEffectTick30(rdram))\n        {\n            SET_GPR_U32(ctx, 2, 0u);\n            ctx->pc = caller;\n            return;\n        }\n    }\n    ctx->pc = 0x1cd580u;\n\n    // 0x1cd580:"
+  },
+  {
+   "file": "sub_001CE1B0_0x1ce1b0.cpp",
+   "original": "    // 0x1ce9b4:",
+   "replacement": "    if (lcsTimedParticleType(GPR_U32(ctx, 23) - 1u)) // current particle type + 1\n        ctx->f[1] = lcsSmokeExpansion(rdram, ctx->f[1]);\n    // 0x1ce9b4:"
+  },
+  {
+   "file": "sub_001CE1B0_0x1ce1b0.cpp",
+   "original": "const bool branch_taken_0x1cf120 = (GPR_U64(ctx, 3) == GPR_U64(ctx, 0));",
+   "replacement": "const bool branch_taken_0x1cf120 = (GPR_U64(ctx, 3) == GPR_U64(ctx, 0)) ||\n            (lcsTimedParticleType(GPR_U32(ctx, 23) - 1u) && !lcsEffectTick30(rdram));"
+  },
+  {
+   "file": "sub_001CE1B0_0x1ce1b0.cpp",
+   "original": "const bool branch_taken_0x1cf150 = (GPR_U64(ctx, 3) == GPR_U64(ctx, 0));",
+   "replacement": "const bool branch_taken_0x1cf150 = (GPR_U64(ctx, 3) == GPR_U64(ctx, 0));"
+  },
+  {
+   "file": "sub_001CE1B0_0x1ce1b0.cpp",
+   "original": "const bool branch_taken_0x1cf190 = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0));",
+   "replacement": "const bool branch_taken_0x1cf190 = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0)) ||\n            (lcsTimedParticleType(GPR_U32(ctx, 23) - 1u) && !lcsEffectTick30(rdram));"
+  },
+  {
+   "file": "sub_001013D0_0x1013d0.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nbool lcsAdvanceSign(const uint8_t *rdram, uint32_t slot);"
+  },
+  {
+   "file": "sub_001013D0_0x1013d0.cpp",
+   "original": "    ctx->pc = 0x1014f0u;\n    SET_GPR_S32(ctx, 2, (int32_t)FAST_READ32(0x3D9B6Cu));",
+   "replacement": "    ctx->pc = 0x1014f0u;\n    SET_GPR_S32(ctx, 2, (int32_t)FAST_READ32(0x3D9B6Cu));"
+  },
+  {
+   "file": "sub_001013D0_0x1013d0.cpp",
+   "original": "const bool branch_taken_0x1014fc = (GPR_U64(ctx, 2) != GPR_U64(ctx, 0));",
+   "replacement": "const bool branch_taken_0x1014fc = !lcsAdvanceSign(rdram, GPR_U32(ctx, 17));"
+  },
+  {
+   "file": "sub_001CE1B0_0x1ce1b0.cpp",
+   "original": "const bool branch_taken_0x1cf1f0 = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0));",
+   "replacement": "const bool branch_taken_0x1cf1f0 = (GPR_U64(ctx, 2) == GPR_U64(ctx, 0)) ||\n            (lcsTimedParticleType(GPR_U32(ctx, 23) - 1u) && !lcsEffectTick30(rdram));"
+  },
+  {
+   "file": "sub_001CE1B0_0x1ce1b0.cpp",
+   "original": "    // 0x1cf230: 0xc073fcc  jal         func_1CFF30",
+   "replacement": "    if (GPR_U32(ctx, 23) == 67u)\n        lcsTraceTyreSmokeRemoval(rdram, GPR_U32(ctx, 17));\n    // 0x1cf230: 0xc073fcc  jal         func_1CFF30"
+  },
+  {
+   "file": "sub_001CE1B0_0x1ce1b0.cpp",
+   "original": "    ctx->pc = 0x1cf15cu;\n    SET_GPR_S32(ctx, 4, (int32_t)SUB32(GPR_U32(ctx, 2), GPR_U32(ctx, 3)));",
+   "replacement": "    ctx->pc = 0x1cf15cu;\n    if (lcsTimedParticleType(GPR_U32(ctx, 23) - 1u))\n        SET_GPR_S32(ctx, 3, lcsTyreSmokeFade(rdram, GPR_U32(ctx, 17), static_cast<int32_t>(GPR_U32(ctx, 3))));\n    SET_GPR_S32(ctx, 4, (int32_t)SUB32(GPR_U32(ctx, 2), GPR_U32(ctx, 3)));"
+  },
+  {
+   "file": "sub_001CD5B8_0x1cd5b8.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\n#include \"lcs/lcs_smoke_timing.h\"\nvoid lcsStartTyreSmoke(const uint8_t *rdram, uint32_t particle);"
+  },
+  {
+   "file": "sub_001CD5B8_0x1cd5b8.cpp",
+   "original": "    // 0x1cd70c: 0x92620036  lbu         $v0, 0x36($s3)",
+   "replacement": "    if (lcsTimedParticleType(GPR_U32(ctx, 21)))\n        lcsStartTyreSmoke(rdram, GPR_U32(ctx, 18));\n    // 0x1cd70c: 0x92620036  lbu         $v0, 0x36($s3)"
+  },
+  {
+   "file": "sub_0016B080_0x16b080.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nfloat lcsEffectShare30();\nfloat lcsCloudPhaseStep(float increment);"
+  },
+  {
+   "file": "sub_0016B080_0x16b080.cpp",
+   "original": "    ctx->pc = 0x16b0d8u;\n    ctx->f[2] = FPU_ADD_S(ctx->f[2], ctx->f[0]);",
+   "replacement": "    ctx->pc = 0x16b0d8u;\n    ctx->f[2] = FPU_ADD_S(ctx->f[2], FPU_MUL_S(ctx->f[0], lcsEffectShare30()));"
+  },
+  {
+   "file": "sub_0016B080_0x16b080.cpp",
+   "original": "    ctx->pc = 0x16b140u;\n    ctx->f[12] = FPU_ADD_S(ctx->f[12], ctx->f[0]);",
+   "replacement": "    ctx->pc = 0x16b140u;\n    ctx->f[12] = FPU_ADD_S(ctx->f[12], FPU_MUL_S(ctx->f[0], lcsEffectShare30()));"
+  },
+  {
+   "file": "sub_0016B080_0x16b080.cpp",
+   "original": "    ctx->pc = 0x16b144u;\n    ctx->f[12] = FPU_MUL_S(ctx->f[12], ctx->f[1]);",
+   "replacement": "    ctx->pc = 0x16b144u;\n    ctx->f[12] = lcsCloudPhaseStep(FPU_MUL_S(ctx->f[12], ctx->f[1]));"
+  },
+  {
+   "file": "sub_0020DE28_0x20de28.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nfloat lcsEffectShare30();"
+  },
+  {
+   "file": "sub_0020DE28_0x20de28.cpp",
+   "original": "        ctx->f[21] = FPU_ADD_S(ctx->f[0], ctx->f[2]);",
+   "replacement": "        ctx->f[21] = FPU_MUL_S(FPU_ADD_S(ctx->f[0], ctx->f[2]), lcsEffectShare30());"
+  },
+  {
+   "file": "sub_0020DE28_0x20de28.cpp",
+   "original": "    // 0x20df4c: 0x46150000  add.s       $f0, $f0, $f21",
+   "replacement": "    ctx->f[20] = FPU_MUL_S(ctx->f[20], lcsEffectShare30());\n    // 0x20df4c: 0x46150000  add.s       $f0, $f0, $f21"
+  },
+  {
+   "file": "sub_001662A0_0x1662a0.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nnamespace lcs_prompts { uint16_t layoutChar(uint16_t glyph); }"
+  },
+  {
+   "file": "sub_001662A0_0x1662a0.cpp",
+   "original": "    ctx->pc = 0x1663b0u;\n    SET_GPR_U64(ctx, 4, GPR_U64(ctx, 2) & (uint64_t)(uint16_t)65535);",
+   "replacement": "    ctx->pc = 0x1663b0u;\n    SET_GPR_U64(ctx, 4, lcs_prompts::layoutChar(static_cast<uint16_t>(GPR_U32(ctx, 2))));"
+  },
+  {
+   "file": "sub_002F8F58_0x2f8f58.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nnamespace lcs_prompts { uint32_t expandedToken(uint8_t *, PS2Runtime &, uint32_t, uint32_t, uint32_t); }"
+  },
+  {
+   "file": "sub_002F8F58_0x2f8f58.cpp",
+   "original": "label_2f90b8:\n    // 0x2f90b8:",
+   "replacement": "label_2f90b8:\n    if (const uint32_t token = lcs_prompts::expandedToken(rdram, *runtime, GPR_U32(ctx, 29), GPR_U32(ctx, 18), GPR_U32(ctx, 2)))\n        SET_GPR_U32(ctx, 2, token);\n    // 0x2f90b8:"
+  },
+  {
+   "file": "sub_003067C0_0x3067c0.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nfloat lcsPlayerIdleDelta(const uint8_t *rdram, uint32_t entity, float delta);"
+  },
+  {
+   "file": "sub_003067C0_0x3067c0.cpp",
+   "original": "    // 0x3068b4: 0xc04fe92  jal         func_13FA48",
+   "replacement": "    ctx->f[12] = lcsPlayerIdleDelta(rdram, GPR_U32(ctx, 16), ctx->f[12]);\n    // 0x3068b4: 0xc04fe92  jal         func_13FA48"
+  },
+  {
+   "file": "sub_00102BA0_0x102ba0.cpp",
+   "original": "#include \"ps2_runtime.h\"",
+   "replacement": "#include \"ps2_runtime.h\"\nfloat lcsSignStep();"
+  },
+  {
+   "file": "sub_00102BA0_0x102ba0.cpp",
+   "original": "    ctx->pc = 0x102bd8u;\n    { uint32_t bits = FAST_READ32(0x3D9B8Cu); float f; std::memcpy(&f, &bits, sizeof(f)); ctx->f[1] = f; }",
+   "replacement": "    ctx->pc = 0x102bd8u;\n    ctx->f[1] = lcsSignStep();"
+  }
+ ]
+}

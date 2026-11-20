@@ -38,9 +38,21 @@ namespace platform
         std::array<std::atomic<bool>, GAMEPAD_BUTTON_COUNT> g_padButtons{};
         std::array<std::atomic<float>, AXIS_COUNT> g_padAxes{};
         std::atomic<int> g_crossPressure{-1}, g_squarePressure{-1};
+        std::atomic<int> g_leftPressure{-1}, g_rightPressure{-1};
         std::atomic<bool> g_padConnected{false};
         std::atomic<int> g_padFamily{0}; // GamepadFamily
+        std::atomic<PlayStationModel> g_playStationModel{PlayStationModel::Unknown};
+        struct ConnectedPad
+        {
+            SDL_JoystickID id;
+            SDL_Gamepad *handle;
+            std::array<int, SDL_GAMEPAD_AXIS_COUNT> axisDirections{};
+            uint64_t lastUsed = 0;
+        };
+        std::vector<ConnectedPad> g_gamepads; // SDL event thread
         SDL_Gamepad *g_gamepad = nullptr;
+        uint64_t g_padActivity = 0;
+        std::atomic<uint64_t> g_padActivitySnapshot{0};
 
         SDL_AudioStream *g_audio = nullptr;
         AudioFill g_audioFill = nullptr;
@@ -154,15 +166,105 @@ namespace platform
             }
         }
 
+        auto findGamepad(SDL_JoystickID id)
+        {
+            return std::find_if(g_gamepads.begin(), g_gamepads.end(), [id](const ConnectedPad &pad) { return pad.id == id; });
+        }
+
+        void selectGamepad(SDL_Gamepad *pad)
+        {
+            if (pad == g_gamepad)
+                return;
+            if (g_gamepad && g_rumbleSent)
+                SDL_RumbleGamepad(g_gamepad, 0, 0, 0);
+            g_rumbleSent = 0;
+            g_rumbleSentNs = 0;
+            g_gamepad = pad;
+            if (pad)
+                std::fprintf(stderr, "[platform] active gamepad: %s\n", SDL_GetGamepadName(pad));
+        }
+
         void openGamepad(SDL_JoystickID id)
         {
-            if (g_gamepad)
+            if (findGamepad(id) != g_gamepads.end())
                 return;
-            g_gamepad = SDL_OpenGamepad(id);
-            if (g_gamepad)
-                std::fprintf(stderr, "[platform] gamepad: %s\n", SDL_GetGamepadName(g_gamepad));
+            if (SDL_Gamepad *pad = SDL_OpenGamepad(id))
+            {
+                g_gamepads.push_back({id, pad});
+                if (!g_gamepad)
+                    selectGamepad(pad);
+            }
             else
                 std::fprintf(stderr, "[platform] could not open gamepad %u: %s\n", static_cast<unsigned>(id), SDL_GetError());
+        }
+
+        void removeGamepad(SDL_JoystickID id)
+        {
+            const auto it = findGamepad(id);
+            if (it == g_gamepads.end())
+                return;
+            const bool wasActive = it->handle == g_gamepad;
+            if (wasActive)
+                selectGamepad(nullptr);
+            SDL_CloseGamepad(it->handle);
+            g_gamepads.erase(it);
+            if (wasActive && !g_gamepads.empty())
+            {
+                const auto latest = std::max_element(g_gamepads.begin(), g_gamepads.end(),
+                    [](const ConnectedPad &a, const ConnectedPad &b) { return a.lastUsed < b.lastUsed; });
+                selectGamepad(latest->handle);
+            }
+        }
+
+        void gamepadUsed(ConnectedPad &pad)
+        {
+            if (!windowFocused())
+                return;
+            pad.lastUsed = ++g_padActivity;
+            selectGamepad(pad.handle);
+        }
+
+        void gamepadAxisMoved(const SDL_GamepadAxisEvent &e)
+        {
+            const auto it = findGamepad(e.which);
+            if (it == g_gamepads.end() || e.axis >= SDL_GAMEPAD_AXIS_COUNT)
+                return;
+            const bool trigger = e.axis == SDL_GAMEPAD_AXIS_LEFT_TRIGGER || e.axis == SDL_GAMEPAD_AXIS_RIGHT_TRIGGER;
+            const int activate = trigger ? 10000 : 14000;
+            const int release = trigger ? 7000 : 10000;
+            int &previous = it->axisDirections[e.axis];
+            const int direction = e.value >= activate ? 1 : !trigger && e.value <= -activate ? -1 : 0;
+            if (direction != 0 && direction != previous)
+            {
+                previous = direction;
+                gamepadUsed(*it);
+            }
+            else if (std::abs(int(e.value)) < release)
+                previous = 0;
+        }
+
+        SDL_GamepadType effectiveGamepadType()
+        {
+            if (!g_gamepad)
+                return SDL_GAMEPAD_TYPE_UNKNOWN;
+            const auto real = SDL_GetRealGamepadType(g_gamepad);
+            return familyOf(real) == GamepadFamily::Other ? SDL_GetGamepadType(g_gamepad) : real;
+        }
+
+        PlayStationModel identifyPlayStation(SDL_GamepadType type)
+        {
+            switch (type)
+            {
+            case SDL_GAMEPAD_TYPE_PS5: return PlayStationModel::DualSense;
+            case SDL_GAMEPAD_TYPE_PS4: return PlayStationModel::DualShock4;
+            case SDL_GAMEPAD_TYPE_PS3: return PlayStationModel::DualShock3;
+            default: break;
+            }
+            const char *name = g_gamepad ? SDL_GetGamepadName(g_gamepad) : nullptr;
+            if (name && (SDL_strcasestr(name, "dualshock 2") || SDL_strcasestr(name, "playstation 2") ||
+                         SDL_strcasestr(name, "PS2 controller")))
+                return PlayStationModel::DualShock2;
+            return PlayStationModel::Unknown;
         }
 
         void snapshotGamepad()
@@ -192,9 +294,15 @@ namespace platform
             };
             g_crossPressure.store(readPressure(6), std::memory_order_relaxed);
             g_squarePressure.store(readPressure(8), std::memory_order_relaxed);
+            g_leftPressure.store(readPressure(14), std::memory_order_relaxed);
+            g_rightPressure.store(readPressure(15), std::memory_order_relaxed);
             g_padConnected.store(g_gamepad != nullptr, std::memory_order_relaxed);
-            g_padFamily.store(static_cast<int>(g_gamepad ? familyOf(SDL_GetGamepadType(g_gamepad)) : GamepadFamily::None),
-                              std::memory_order_relaxed);
+            const auto type = effectiveGamepadType();
+            const auto model = identifyPlayStation(type);
+            g_playStationModel.store(model, std::memory_order_relaxed);
+            const auto family = !g_gamepad ? GamepadFamily::None :
+                model == PlayStationModel::Unknown ? familyOf(type) : GamepadFamily::PlayStation;
+            g_padFamily.store(static_cast<int>(family), std::memory_order_release);
             for (int b = 0; b < GAMEPAD_BUTTON_COUNT; ++b)
                 g_padButtons[b].store(g_gamepad && SDL_GetGamepadButton(g_gamepad, kButtons[b]), std::memory_order_relaxed);
             for (int a = 0; a < AXIS_COUNT; ++a)
@@ -396,7 +504,7 @@ namespace platform
         SDL_JoystickID *gamepads = SDL_GetGamepads(&gamepadCount);
         if (gamepads)
         {
-            for (int i = 0; i < gamepadCount && !g_gamepad; ++i)
+            for (int i = 0; i < gamepadCount; ++i)
                 openGamepad(gamepads[i]);
             SDL_free(gamepads);
         }
@@ -463,9 +571,10 @@ namespace platform
         }
         if (ImGui::GetCurrentContext())
             ImGui::DestroyContext();
-        if (g_gamepad)
-            SDL_CloseGamepad(g_gamepad);
-        g_gamepad = nullptr;
+        selectGamepad(nullptr);
+        for (const auto &pad : g_gamepads)
+            SDL_CloseGamepad(pad.handle);
+        g_gamepads.clear();
         if (g_window)
             SDL_DestroyWindow(g_window);
         g_window = nullptr;
@@ -579,18 +688,14 @@ namespace platform
                 openGamepad(e.gdevice.which);
                 break;
             case SDL_EVENT_GAMEPAD_REMOVED:
-                if (g_gamepad && SDL_GetGamepadID(g_gamepad) == e.gdevice.which)
-                {
-                    SDL_CloseGamepad(g_gamepad);
-                    g_gamepad = nullptr;
-                    int count = 0;
-                    if (SDL_JoystickID *ids = SDL_GetGamepads(&count))
-                    {
-                        if (count > 0)
-                            openGamepad(ids[0]);
-                        SDL_free(ids);
-                    }
-                }
+                removeGamepad(e.gdevice.which);
+                break;
+            case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
+                if (const auto it = findGamepad(e.gbutton.which); it != g_gamepads.end())
+                    gamepadUsed(*it);
+                break;
+            case SDL_EVENT_GAMEPAD_AXIS_MOTION:
+                gamepadAxisMoved(e.gaxis);
                 break;
             default:
                 break;
@@ -660,6 +765,7 @@ namespace platform
             g_keys[k].store(pseudo[k], std::memory_order_relaxed);
         }
         snapshotGamepad();
+        g_padActivitySnapshot.store(g_padActivity, std::memory_order_release);
 
         // capture follows the wish while the window has the focus (it was let go on focus loss)
         const bool capture = g_wantCapture && windowFocused();
@@ -789,6 +895,7 @@ namespace platform
         y = g_mouseY.load(std::memory_order_relaxed);
         return g_mouseOver.load(std::memory_order_relaxed);
     }
+    uint64_t gamepadActivitySerial() { return g_padActivitySnapshot.load(std::memory_order_acquire); }
     bool gamepadConnected() { return g_padConnected.load(std::memory_order_relaxed); }
     bool gamepadButton(GamepadButton button) { return g_padButtons[button].load(std::memory_order_relaxed); }
     float gamepadAxis(GamepadAxis axis) { return g_padAxes[axis].load(std::memory_order_relaxed); }
@@ -798,10 +905,15 @@ namespace platform
             return g_crossPressure.load(std::memory_order_relaxed);
         if (button == GAMEPAD_WEST)
             return g_squarePressure.load(std::memory_order_relaxed);
+        if (button == GAMEPAD_DPAD_LEFT)
+            return g_leftPressure.load(std::memory_order_relaxed);
+        if (button == GAMEPAD_DPAD_RIGHT)
+            return g_rightPressure.load(std::memory_order_relaxed);
         return -1;
     }
 
-    GamepadFamily gamepadFamily() { return static_cast<GamepadFamily>(g_padFamily.load(std::memory_order_relaxed)); }
+    GamepadFamily gamepadFamily() { return static_cast<GamepadFamily>(g_padFamily.load(std::memory_order_acquire)); }
+    PlayStationModel playStationModel() { return g_playStationModel.load(std::memory_order_relaxed); }
 
     const char *gamepadName()
     {

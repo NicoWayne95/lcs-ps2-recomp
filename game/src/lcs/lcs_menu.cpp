@@ -632,6 +632,40 @@ namespace lcs_menu
         PS2_GUEST_CC void print(uint8_t *rdram, R5900Context *ctx, PS2Runtime *runtime)
         {
             if (ctx->pc == kPrint)
+            {
+                static const bool traceFonts = lcs_diag::wanted("LCS_TRACE_FONT_ATLAS");
+                static std::vector<uint64_t> seen;
+                if (traceFonts && seen.size() < 256)
+                {
+                    // CFont::RenderFontBuffer binds slot *(int16_t*)0x408444.
+                    constexpr const char *atlases[] = {"font2/font2m", "font1/font1m", "font3/font3m"};
+                    int16_t slot;
+                    std::memcpy(&slot, rdram + 0x408444u, sizeof(slot));
+                    const uint32_t text = GPR_U32(ctx, 4) & kRamMask;
+                    if (slot >= 0 && slot < 3 && text && text <= PS2_RAM_SIZE - 96u)
+                    {
+                        char sample[48]{};
+                        uint32_t hash = 2166136261u;
+                        for (unsigned i = 0; i < sizeof(sample) - 1; ++i)
+                        {
+                            uint16_t c;
+                            std::memcpy(&c, rdram + text + i * 2u, sizeof(c));
+                            if (!c)
+                                break;
+                            sample[i] = c >= 32 && c < 127 ? char(c) : '?';
+                            hash = (hash ^ c) * 16777619u;
+                        }
+                        const uint32_t caller = GPR_U32(ctx, 31);
+                        const uint64_t key = (uint64_t(caller | (uint32_t(slot) << 24)) << 32) | hash;
+                        if (sample[0] && std::find(seen.begin(), seen.end(), key) == seen.end())
+                        {
+                            seen.push_back(key);
+                            std::fprintf(stderr, "[lcs-font-atlas] %s, caller %06X, text %s\n", atlases[slot], caller, sample);
+                        }
+                    }
+                }
+            }
+            if (ctx->pc == kPrint)
             { // diagnosis for the key prompts: printed texts with a button token (~X~ ~O~ ~T~ ~S~ ~K~ ...), in or out of menus
                 static int told = 0;
                 static const bool promptLog = lcs_diag::wanted("LCS_PROMPT_LOG");

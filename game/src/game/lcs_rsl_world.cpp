@@ -70,6 +70,7 @@ namespace lcs::rslworld
             uint32_t units = 0; // step 4: a block copied without its bytes - its length (8-byte units) as last copied
             bool wouldSkip = false; // LCS_RSL_SKIP_VERIFY: copied all the same, checked against the recording
             bool producerSlot = false; // submitted at the LCS draw site
+            uint32_t itemIndexPlusOne = 0; // native LCS draw item in this chain
             uint64_t flatHash = 0;  // LCS_RSL_ITEMS_VERIFY: the hash of the block as an item would have copied it (0: none)
         };
 
@@ -128,7 +129,6 @@ namespace lcs::rslworld
         struct ChainTable
         {
             std::vector<Draw> draws;
-            std::unordered_map<uint32_t, uint32_t> lcsDrawItems;
             std::vector<RasterRef> rasters; // by offset
             uint64_t seq = 0;               // step 4: which kick (g_chainSeq)
             std::vector<Item> items;        // step 4c: the frame's draw items, by MARK index - kItemMark
@@ -146,7 +146,7 @@ namespace lcs::rslworld
         std::vector<std::pair<uint64_t, uint64_t>> g_confirmPending;
         thread_local std::vector<std::pair<uint64_t, uint64_t>> t_confirm;
         std::atomic<uint64_t> g_skipped{0}, g_skipReplayed{0}, g_skipFallback{0};
-        std::atomic<uint64_t> g_lcsItemBytes[KindCount]{}, g_lcsItemCount[KindCount]{};
+        std::atomic<uint64_t> g_lcsItemBytes[KindCount]{}, g_lcsItemCount[KindCount]{}, g_lcsDirectItemCount[KindCount]{};
         std::atomic<uint64_t> g_lcsStateCount{0}, g_lcsUploadCount{0};
         std::atomic<uint64_t> g_lcsProducerSlots{0}, g_lcsProducerExecuted{0}, g_lcsPreparedBytes{0};
         std::atomic<uint64_t> g_lcsNoSnapshot{0}, g_lcsDirty{0}, g_lcsUnconfirmed{0}, g_lcsTagCommands{0}, g_lcsUnsupported{0};
@@ -407,7 +407,7 @@ namespace lcs::rslworld
             rec.finalCycle = memory.vif1_regs.cycle;
         }
 
-        void replay(PS2Memory &memory, const Recording &rec)
+        void replay(PS2Memory &memory, const Recording &rec, bool directWorld)
         {
             uint8_t *vu = memory.getVU1Data();
             for (const Op &op : rec.ops)
@@ -415,7 +415,8 @@ namespace lcs::rslworld
                 if (op.type == Op::Mscal)
                 {
                     lcs::hleworld::setMeshHint(op.mesh.valid ? &op.mesh : nullptr);
-                    memory.vu1Mscal(op.startPc);
+                    const bool cachedWorld = directWorld && op.startPc == 0x30u && op.mesh.valid;
+                    memory.vu1Mscal(op.startPc, cachedWorld ? &lcs::hleworld::drawRecordedWorld : nullptr);
                     lcs::hleworld::setMeshHint(nullptr);
                     ++g_packets;
                 }
@@ -490,7 +491,7 @@ namespace lcs::rslworld
                     what = "unpack address / size / fields";
                 else if (x.type == Op::Direct || x.type == Op::Raw ? x.data != y.data : !sameLanes(x, y))
                     what = x.type == Op::Direct ? "direct data" : x.type == Op::Raw ? "raw VIFcodes / microcode" : "unpack data";
-                else if (x.mesh.valid && y.mesh.valid && (x.mesh.key != y.mesh.key || x.mesh.vertices != y.mesh.vertices))
+                else if (x.mesh.valid && y.mesh.valid && (x.mesh.key != y.mesh.key || *x.mesh.vertices != *y.mesh.vertices))
                     what = "mesh";
             }
             if (what)
@@ -602,9 +603,10 @@ namespace lcs::rslworld
                              (unsigned long long)g_lcsUnconfirmed.exchange(0), (unsigned long long)g_lcsTagCommands.exchange(0),
                              (unsigned long long)g_lcsUnsupported.exchange(0));
                 for (const Kind kind : {World, Model, ModelB, OtherCall})
-                    std::fprintf(stderr, "[lcs-rsl] %s: %llu items executed without DMA copying, %llu bytes bypassed\n",
+                    std::fprintf(stderr, "[lcs-rsl] %s: %llu items executed without DMA copying, %llu bytes bypassed, %llu direct replays\n",
                                  kKindNames[kind], (unsigned long long)g_lcsItemCount[kind].exchange(0),
-                                 (unsigned long long)g_lcsItemBytes[kind].exchange(0));
+                                 (unsigned long long)g_lcsItemBytes[kind].exchange(0),
+                                 (unsigned long long)g_lcsDirectItemCount[kind].exchange(0));
             }
             if (g_lcsInstalled && !g_verify)
             {
@@ -692,7 +694,7 @@ namespace lcs::rslworld
                 Recording &rec = it->second;
                 if (!rec.ops.empty() && rec.replayable && rec.mode == memory.vif1_regs.mode && rec.cycle == memory.vif1_regs.cycle)
                 {
-                    replay(memory, rec);
+                    replay(memory, rec, d.kind == World);
                     ++g_stats[d.kind].blocks;
                     ++g_stats[d.kind].replayed;
                     ++g_skipReplayed;
@@ -764,9 +766,8 @@ namespace lcs::rslworld
             if (units == ps2chain::kSkippedLength) // step 4: no bytes copied
             {
                 ++g_skipSeen;
-                const auto item = table->lcsDrawItems.find(imm);
-                if (item != table->lcsDrawItems.end())
-                    onItem(memory, item->second, table->itemFrame & 0xFFFFu);
+                if (d.itemIndexPlusOne)
+                    onItem(memory, d.itemIndexPlusOne - 1u, table->itemFrame & 0xFFFFu);
                 else
                     replaySkipped(memory, d, table->seq);
                 report();
@@ -782,6 +783,40 @@ namespace lcs::rslworld
         }
 
         std::atomic<uint64_t> g_itemsSeenW{0}, g_itemsUnplacedW{0}, g_itemBlockSameW{0}, g_itemBlockDifferW{0};
+
+        // The chain owns an immutable packet snapshot, even if the guest reuses the source
+        // address before the render worker gets here. Match the recording and live VIF state.
+        bool replayConfirmedDrawItem(PS2Memory &memory, const Item &item, uint64_t seq)
+        {
+            static const bool enabled = [] {
+                const char *value = std::getenv("LCS_RSL_DIRECT_ITEMS");
+                return !value || *value != '0';
+            }();
+            const Draw &draw = item.d;
+            if (!enabled || !item.confirmed || g_verify ||
+                (draw.kind != World && draw.kind != Model && draw.kind != ModelB) ||
+                draw.wouldSkip || draw.flatHash || !item.confirmed->hash)
+                return false;
+
+            const uint64_t key = recordingKey(draw.kind, draw.addr, draw.units);
+            const auto found = g_recordings.find(key);
+            if (found == g_recordings.end())
+                return false;
+            Recording &rec = found->second;
+            if (rec.skip || !rec.replayable || rec.ops.empty() || rec.hash != item.confirmed->hash ||
+                rec.mode != memory.vif1_regs.mode || rec.cycle != memory.vif1_regs.cycle)
+                return false;
+
+            replay(memory, rec, draw.kind == World);
+            rec.changes = 0;
+            ++g_stats[draw.kind].blocks;
+            ++g_stats[draw.kind].replayed;
+            if (g_log)
+                g_lcsDirectItemCount[draw.kind].fetch_add(1, std::memory_order_relaxed);
+            if (g_skip)
+                t_confirm.push_back({key, seq});
+            return true;
+        }
 
         std::atomic<uint64_t> g_itemsStaleW{0};
         void onItem(PS2Memory &memory, uint32_t index, uint32_t frame)
@@ -847,8 +882,9 @@ namespace lcs::rslworld
                     t_blockRasters = it.rasterCount ? &table->itemRasters[it.rastersAt] : nullptr;
                     t_blockRasterCount = it.rasterCount;
                 }
-                handleBlock(memory, it.d, table->seq, t_block, t_blockBytes, t_blockBytes / 8u,
-                            it.confirmed ? it.confirmed->hash : 0u);
+                if (!replayConfirmedDrawItem(memory, it, table->seq))
+                    handleBlock(memory, it.d, table->seq, t_block, t_blockBytes, t_blockBytes / 8u,
+                                it.confirmed ? it.confirmed->hash : 0u);
                 t_block = nullptr;
                 t_blockBytes = 0;
                 t_blockRasters = nullptr;
@@ -909,7 +945,7 @@ namespace lcs::rslworld
             const uint64_t key = (uint64_t(d.kind) << 56) | (uint64_t(d.addr & kRamMask) << 24) | units;
             if (valid && rec.replayable && !g_verify)
             {
-                replay(memory, rec);
+                replay(memory, rec, d.kind == World);
                 rec.changes = 0;
                 ++stats.replayed;
                 if (g_skip)
@@ -3636,14 +3672,12 @@ namespace lcs::rslworld
                         draw.wouldSkip = true;
                     else
                     {
-                        const uint32_t index = static_cast<uint32_t>(g_building.draws.size());
+                        draw.itemIndexPlusOne = static_cast<uint32_t>(g_building.items.size()) + 1u;
                         if (const uint32_t marker = mark(draw))
                         {
-                            const uint32_t itemIndex = static_cast<uint32_t>(g_building.items.size());
                             Item &item = g_building.items.emplace_back();
                             item.d = draw;
                             item.confirmed = std::move(bytes);
-                            g_building.lcsDrawItems.emplace(index, itemIndex);
                             ++g_skipped;
                             return marker | ps2chain::kSkipWithMark;
                         }

@@ -2760,7 +2760,7 @@ namespace
     thread_local const lcs::hleworld::WorldMesh *t_meshHint = nullptr;
     thread_local lcs::hleworld::WorldMesh *t_meshCapture = nullptr;
 
-    bool drawNative(const ps2hle::MscalContext &c)
+    bool drawNative(const ps2hle::MscalContext &c, bool recordedOpaque = false)
     {
         if (c.startPc != 0x30u || !ps2hle::gs())
             return false;
@@ -2801,6 +2801,15 @@ namespace
         const uint32_t count = static_cast<uint32_t>(header.v[2]);
         const uint32_t nloop = std::min(static_cast<uint32_t>(header.v[3]), count);
         if (count == 0u || count > 256u)
+            return false;
+        const IVec4 tag = loadI(vu, 49);
+        const uint64_t tagLo = uint64_t(uint32_t(tag.v[0])) | (uint64_t(uint32_t(tag.v[1])) << 32);
+        const uint64_t prim = (tagLo >> 47) & 0x7FFu;
+        const auto *hint = t_meshHint;
+        const bool recordedMesh = hint && hint->valid && hint->count == count;
+        // Entry 0xDE follows the EE sector visibility test and does not run the VU clipper.
+        if (recordedOpaque && (!recordedMesh || !nloop || !(tagLo & (1ull << 46)) ||
+                               (prim & (1u << 6)) || (loadI(vu, 52).v[0] & 0xFFFF) != 0xDE))
             return false;
         ++g_native.packets;
 
@@ -2866,12 +2875,13 @@ namespace
         d.vertexStride = 32;
         d.vertexCount = count;
         d.drawCount = nloop;
-        const lcs::hleworld::WorldMesh *hint = t_meshHint;
-        t_meshHint = nullptr;
-        if (hint && hint->valid && hint->count == count) // the RSL world replay: the mesh of the recorded block
+        // Keep the hint available if the direct submission declines and MSCAL falls back.
+        if (!recordedOpaque)
+            t_meshHint = nullptr;
+        if (recordedMesh)
         {
             d.meshKey = hint->key;
-            d.vertices = hint->vertices.data();
+            d.vertices = hint->vertices->data();
         }
         else
         {
@@ -2900,7 +2910,7 @@ namespace
                 capture->valid = true;
                 capture->key = d.meshKey;
                 capture->count = count;
-                capture->vertices = verts;
+                capture->vertices = std::make_shared<const std::vector<uint8_t>>(verts);
             }
         }
         t_meshCapture = nullptr;
@@ -2934,11 +2944,7 @@ namespace
             putRow(k + 44 + r * 4, cm[r]);
         d.constantCount = 60;
 
-        // the kick's GIFtag (49, the unclipped path's) carries PRIM
-        const IVec4 tag = loadI(vu, 49);
-        const uint64_t tagLo = uint64_t(uint32_t(tag.v[0])) | (uint64_t(uint32_t(tag.v[1])) << 32);
-        const uint64_t prim = (tagLo >> 47) & 0x7FFu;
-        if (!ps2hle::gs()->submitNative(prim, d))
+        if (!ps2hle::gs()->submitNative(prim, d, recordedMesh ? &hint->vertices : nullptr))
         {
             ++g_native.fallback;
             return false;
@@ -3942,3 +3948,20 @@ namespace
 
 void lcs::hleworld::setMeshCapture(WorldMesh *capture) { t_meshCapture = capture; }
 void lcs::hleworld::setMeshHint(const WorldMesh *hint) { t_meshHint = hint; }
+
+bool lcs::hleworld::drawRecordedWorld(const ps2hle::MscalContext &context)
+{
+    static const bool enabled = [] {
+        const char *value = std::getenv("LCS_RSL_GPU_WORLD");
+        return (!value || *value != '0') && !std::getenv("LCS_RSL_SHADOW") && !std::getenv("PS2X_HLE_STATS");
+    }();
+    if (!enabled || ps2hle::mscalBefore() != &beforeNative ||
+        residentLcsDrawImage(context.vuCode, context.codeGeneration) != LcsDrawImage::Unknown)
+        return false;
+
+    const int rounding = sseRounding();
+    setSseRounding(FE_TOWARDZERO);
+    const bool drawn = drawNative(context, true);
+    setSseRounding(rounding);
+    return drawn;
+}

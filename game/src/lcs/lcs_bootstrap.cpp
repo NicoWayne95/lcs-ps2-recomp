@@ -5,6 +5,7 @@
 #include "debug/profiler.h"
 #include "lcs_rpc_diag.h"
 #include "lcs_diag.h"
+#include "lcs_prompts.h"
 #include "ps2_runtime.h"
 #include "ps2_runtime_macros.h"
 #include "ps2_syscalls.h"
@@ -1768,6 +1769,7 @@ void apply(PS2Runtime& runtime) {
     lcs_world::install(runtime); // [lcs] draw distance: the LOD scale 0x3D7578 (src/lcs/lcs_world_detail.cpp)
     lcs_timestep::install(runtime); // [lcs] the step floor's excess paid back (src/lcs/lcs_timestep.cpp)
     lcs_hud_timing::install(runtime); // [lcs] the HUD's flashing (wanted stars ...) on the game clock (src/lcs/lcs_hud_timing.cpp)
+    lcs_prompts::install(runtime);
     lcs_hud::install(runtime);   // [lcs-hud] the 2D primitives for the HUD's per-element anchoring (src/lcs/lcs_hud.cpp)
     lcs_freecam::install(runtime); // [lcs-freecam] F8: fly the camera around the world (src/lcs/lcs_freecam.cpp)
     lcs_menu::install(runtime);    // [lcs-menu] experimental pause-menu video page (empty outside the menu build)

@@ -31,7 +31,7 @@ cbuffer Draw : register(b0)
     float4 fogColor;       // rgb 0..255
     float4 filterSize;     // a filtered read (atstArefAfailRt.w == 3, sampleRtFiltered): xy the footprint of one target
                            // PS2 pixel in source texels (the tent's half-width), zw the source's size in texels (clamp)
-    float4 filterDest;     // a filtered read: xy the target's own scale (target pixels per PS2 pixel)
+    float4 filterDest;     // xy target scale for filtered reads; z depth quantization scale (0 disables it)
 };
 
 struct VSIn
@@ -368,7 +368,8 @@ PSOut ps_main(VSOut i)
     // GS Z is Z24/Z32 / 2^n: written directly (going through GL's NDC rounded near values and collapsed far ones; with
     // D3D / Vulkan's 0..1 depth the rasterised value is the same: SHADER_DEPTH 0)
 #if SHADER_DEPTH
-    o.depth = i.depth;
+    const float zSteps = filterDest.z;
+    o.depth = zSteps > 0.0 ? floor(saturate(i.depth) * zSteps) / zSteps : i.depth;
 #endif
     const float4 vc = floor((linearIipFgeAte.y == 1 ? i.col : i.colFlat) * 255.0 + 0.5);
     float4 c = vc;

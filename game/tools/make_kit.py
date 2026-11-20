@@ -27,7 +27,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
 RECOMPILER_COMMIT = "d8648c3"
 BUILD_TOOLS = ["hlsl_dxbc.py", "hlsl_spirv.py", "lcs_postprocess.py", "lcs_codegen_edits.json", "sync_generated.py",
-               "vu1_recomp.py"]
+               "vu1_recomp.py", "Generate-PromptAtlas.ps1"]
 NEVER = re.compile(r"(\.iso|\.elf|SLUS_\d+\.\d+|\.ps2|\.bin|\.pdb|\.obj|\.o)$", re.I)
 # the build tools the launcher downloads (official downloads, hashed 2026-11-17; the launcher refuses anything but
 # https and checks size and SHA-256). "folder": the folder under toolchain\ it ends up in; "inner": the zip has it at
@@ -90,7 +90,7 @@ def neutral(path):
 
 def main(out, lcs_recomp, guest, uploads):
     if os.path.exists(out):
-        shutil.rmtree(out)
+        raise FileExistsError(f"kit output directory already exists: {out}")
     src = os.path.join(out, "source")
     os.makedirs(src)
     shutil.copy2(os.path.join(ROOT, "CMakeLists.txt"), src)
@@ -103,7 +103,7 @@ def main(out, lcs_recomp, guest, uploads):
 
     # the recompiler at the commit the game's code is made with (git archive: nothing in the checkout changes)
     rec = os.path.join(out, "recompiler")
-    data = subprocess.run(["git", "-C", lcs_recomp, "archive", RECOMPILER_COMMIT, "third_party/PS2Recomp"],
+    data = subprocess.run(["git", "--git-dir", os.path.join(lcs_recomp, ".git"), "archive", RECOMPILER_COMMIT, "third_party/PS2Recomp"],
                           check=True, capture_output=True).stdout
     with tarfile.open(fileobj=io.BytesIO(data)) as tar:
         tar.extractall(os.path.join(out, "_rec"), filter="data")
