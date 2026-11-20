@@ -32,3 +32,4 @@
 *.chd
 *.suprx
 *.dll
+**/*PROMPT*.md
