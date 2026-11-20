@@ -745,14 +745,7 @@ License: [GPL-3.0](https://github.com/ran-j/PS2Recomp/blob/main/LICENSE)
 
 [**GTA: Vice City Stories Recomp by gothamor**](https://github.com/gothamor/gta-vcs-recomp)
 
-Served as a major technical reference and source for several runtime components used in LCS Recomp, including:
-
-- World rendering.
-- High-level world rendering implementation.
-- Native audio playback.
-- Native movie playback.
-- Frame presentation.
-- Additional runtime modifications built on top of PS2Recomp.
+Served as a  technical reference
 
 License: [GPL-3.0](https://github.com/gothamor/gta-vcs-recomp/blob/main/LICENSE)
 
