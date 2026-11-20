@@ -1,0 +1,11 @@
+/build/
+/tmp/
+/deps/
+/generated/
+/obj/
+/saves/
+/run_*/
+/sound_ref.rpc
+*.log
+__pycache__/
+*.pyc

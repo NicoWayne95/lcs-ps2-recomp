@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LCS Recomp Launcher (Beta)</title>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="ring-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0a95ff"/><stop offset="1" stop-color="#00c8ff"/></linearGradient></defs></svg>
+  <div class="app">
+    <header class="titlebar" data-tauri-drag-region>
+      <div class="tb-title" data-tauri-drag-region>LCS Recomp <em id="tb-version" data-tauri-drag-region></em></div>
+      <button class="search" id="open-palette"><img src="/media/icons/png/search_white_64.png" alt="" /><span data-i18n="pal.hint"></span><kbd>Ctrl K</kbd></button>
+      <div class="lang" role="group" aria-label="Language"><button data-lang="en">EN</button><button data-lang="de">DE</button></div>
+      <button class="tb-btn" id="tb-min" aria-label="Minimize"><img src="/media/icons/png/minimize_white_64.png" alt="" /></button>
+      <button class="tb-btn" id="tb-max" aria-label="Maximize"><img src="/media/icons/png/maximize_white_64.png" alt="" /></button>
+      <button class="tb-btn close" id="tb-close" aria-label="Close"><img src="/media/icons/png/close_white_64.png" alt="" /></button>
+    </header>
+
+    <nav class="rail">
+      <img class="rail-logo" src="/media/branding/lcs_recomp_cover_256.png" alt="LCS Recomp" />
+      <button class="nav active" data-page="home"><img src="/media/icons/png/home_white_64.png" alt="" /><span class="tip" data-i18n="nav.home"></span></button>
+      <button class="nav" data-page="install"><img src="/media/icons/png/installation_white_64.png" alt="" /><span class="tip" data-i18n="nav.install"></span></button>
+      <button class="nav" data-page="saves"><img src="/media/icons/png/save_white_64.png" alt="" /><span class="tip" data-i18n="nav.saves"></span></button>
+      <button class="nav" data-page="settings"><img src="/media/icons/png/settings_white_64.png" alt="" /><span class="tip" data-i18n="nav.settings"></span></button>
+      <button class="nav" data-page="updates"><img src="/media/icons/png/update_white_64.png" alt="" /><span class="tip" data-i18n="nav.updates"></span><i class="badge" id="nav-update-badge" hidden></i></button>
+      <button class="nav rail-task" id="rail-task" hidden>
+        <svg viewBox="0 0 46 46" aria-hidden="true"><circle class="rt-bg" cx="23" cy="23" r="19"/><circle class="rt-fg" id="rail-task-arc" cx="23" cy="23" r="19"/></svg>
+        <b id="rail-task-pct"></b><span class="tip" id="rail-task-tip"></span>
+      </button>
+      <span class="rail-space"></span>
+      <button class="nav" data-open="logs"><img src="/media/icons/png/logs_white_64.png" alt="" /><span class="tip" data-i18n="home.logs"></span></button>
+      <button class="nav" data-page="about"><img src="/media/icons/png/info_white_64.png" alt="" /><span class="tip" data-i18n="nav.about"></span></button>
+    </nav>
+
+    <main>
+      <!-- Home: the cockpit -->
+      <section class="page active home" id="page-home">
+        <div class="banner">
+          <div class="banner-info">
+            <span class="pill" id="home-pill"><i></i><span id="home-status-title"></span></span>
+            <h1 data-i18n="home.gameTitle"></h1>
+            <p id="home-status-detail"></p>
+          </div>
+          <button class="play" id="play"><img src="/media/icons/png/play_white_64.png" alt="" /><span id="play-label"></span></button>
+        </div>
+
+        <div class="card error-card" id="exit-card" hidden>
+          <img class="status-icon" src="/media/status/error_64.png" alt="" />
+          <div class="grow"><b id="exit-title"></b><small id="exit-detail"></small><pre id="exit-log"></pre>
+            <div class="inline"><button class="btn" data-open="logs"><span data-i18n="home.openLog"></span></button><button class="btn" id="exit-dismiss"><span data-i18n="home.dismiss"></span></button></div>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="card">
+            <h3><img src="/media/icons/png/gamepad_cyan_64.png" alt="" /><span data-i18n="home.yourGame"></span><button class="more" data-open="game" data-i18n="home.gameFiles"></button></h3>
+            <div class="kv" id="home-game"></div>
+          </div>
+          <div class="card">
+            <h3><img src="/media/icons/png/save_cyan_64.png" alt="" /><span data-i18n="home.saves"></span><button class="more" id="home-backup" data-i18n="saves.backupShort"></button></h3>
+            <div id="home-saves"></div>
+          </div>
+          <div class="card">
+            <h3><img src="/media/icons/png/settings_cyan_64.png" alt="" /><span data-i18n="home.quick"></span><button class="more" data-goto="settings" data-i18n="home.allSettings"></button></h3>
+            <div id="home-quick"></div>
+          </div>
+        </div>
+        <div class="grid2c">
+          <div class="card" id="home-upd-card">
+            <h3><img src="/media/icons/png/update_cyan_64.png" alt="" /><span data-i18n="nav.updates"></span><button class="more" id="home-check" data-i18n="updates.checkShort"></button></h3>
+            <div class="upd-big"><img id="home-upd-icon" src="/media/icons/png/cloud_cyan_64.png" alt="" /><div><b id="home-version-title"></b><small id="home-version-detail"></small></div></div>
+            <ul class="dots" id="home-upd-notes"></ul>
+            <div class="inline" id="home-upd-actions"></div>
+          </div>
+          <div class="card">
+            <h3><img src="/media/icons/png/logs_cyan_64.png" alt="" /><span data-i18n="home.activity"></span></h3>
+            <div class="activity" id="home-activity"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Installation -->
+      <section class="page form" id="page-install">
+        <h1 data-i18n="install.title"></h1>
+        <p class="lead" data-i18n="install.lead"></p>
+        <div class="panel">
+          <h2><img src="/media/icons/png/iso_cyan_64.png" alt="" /><span data-i18n="install.isoStep"></span></h2>
+          <div class="inline">
+            <input type="text" readonly id="iso-path" />
+            <button class="btn" id="iso-browse"><span data-i18n="install.browse"></span></button>
+            <button class="btn primary" id="iso-check" disabled><span data-i18n="install.check"></span></button>
+          </div>
+          <div class="progress" id="iso-progress" hidden><div class="bar"><div id="iso-bar"></div></div><span id="iso-pct"></span></div>
+          <ul class="checks" id="iso-checks"></ul>
+          <p class="note" data-i18n="install.privacy"></p>
+        </div>
+        <div class="panel">
+          <h2><img src="/media/icons/png/installation_cyan_64.png" alt="" /><span data-i18n="install.prepareStep"></span></h2>
+          <p class="muted" data-i18n="install.prepareLead"></p>
+          <div class="inline">
+            <button class="btn primary" id="prep-start" disabled><img src="/media/icons/png/play_white_64.png" alt="" /><span data-i18n="install.prepare"></span></button>
+            <button class="btn" id="prep-show" hidden><span data-i18n="task.show"></span></button>
+          </div>
+          <p class="note" id="prep-result" hidden></p>
+        </div>
+        <div class="panel">
+          <h2><img src="/media/icons/png/folder_cyan_64.png" alt="" /><span data-i18n="install.folderStep"></span></h2>
+          <div class="inline">
+            <input type="text" readonly id="game-dir" />
+            <button class="btn" id="pick-game-dir"><span data-i18n="install.pickFolder"></span></button>
+          </div>
+          <ul class="checks" id="folder-checks"></ul>
+        </div>
+      </section>
+
+      <!-- Saves -->
+      <section class="page form" id="page-saves">
+        <h1 data-i18n="saves.title"></h1>
+        <p class="lead" data-i18n="saves.lead"></p>
+        <div class="inline">
+          <button class="btn primary" id="saves-backup"><img src="/media/icons/png/archive_white_64.png" alt="" /><span data-i18n="saves.backup"></span></button>
+          <button class="btn" data-open="saves"><img src="/media/icons/png/folder_white_64.png" alt="" /><span data-i18n="saves.openFolder"></span></button>
+        </div>
+        <p class="note" id="saves-result" hidden></p>
+        <div class="panel">
+          <h2><img src="/media/icons/png/folder_cyan_64.png" alt="" /><span data-i18n="saves.folderTitle"></span></h2>
+          <p class="muted small" data-i18n="saves.folderLead"></p>
+          <div class="inline">
+            <input type="text" readonly id="save-dir" />
+            <button class="btn" id="save-dir-pick"><span data-i18n="saves.folderPick"></span></button>
+            <button class="btn" id="save-dir-reset"><span data-i18n="saves.folderDefault"></span></button>
+          </div>
+          <label class="check"><input type="checkbox" id="save-dir-copy" checked /><span data-i18n="saves.folderCopy"></span></label>
+          <p class="note warn" id="save-dir-missing" hidden></p>
+        </div>
+        <div class="grid2">
+          <div class="panel"><h2><img src="/media/icons/png/save_cyan_64.png" alt="" /><span data-i18n="saves.onCard"></span></h2><div id="saves-list"></div></div>
+          <div class="panel"><h2><img src="/media/icons/png/archive_cyan_64.png" alt="" /><span data-i18n="saves.backups"></span></h2><div id="backups-list"></div></div>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section class="page form" id="page-settings">
+        <h1 data-i18n="settings.title"></h1>
+        <p class="lead" data-i18n="settings.lead"></p>
+        <p class="note" id="settings-running" hidden data-i18n="settings.running"></p>
+        <div class="grid2">
+          <div class="panel"><h2><img src="/media/icons/png/monitor_cyan_64.png" alt="" /><span data-i18n="settings.display"></span></h2><div id="set-display"></div></div>
+          <div class="panel"><h2><img src="/media/icons/png/sparkles_cyan_64.png" alt="" /><span data-i18n="settings.graphics"></span></h2><div id="set-graphics"></div></div>
+          <div class="panel"><h2><img src="/media/icons/png/mouse_cyan_64.png" alt="" /><span data-i18n="settings.input"></span></h2><div id="set-input"></div><p class="muted small" data-i18n="settings.inputNote"></p></div>
+          <div class="panel"><h2><img src="/media/icons/png/settings_cyan_64.png" alt="" /><span data-i18n="settings.launcher"></span></h2><div id="set-launcher"></div></div>
+        </div>
+      </section>
+
+      <!-- Updates -->
+      <section class="page form" id="page-updates">
+        <h1 data-i18n="updates.title"></h1>
+        <p class="lead" data-i18n="updates.lead"></p>
+        <div class="update-tile">
+          <img id="upd-icon" src="/media/icons/png/cloud_cyan_64.png" alt="" />
+          <div class="grow"><b id="upd-state"></b><small id="upd-detail"></small></div>
+        </div>
+        <div class="kv">
+          <span data-i18n="updates.installed"></span><b id="upd-installed"></b>
+          <span data-i18n="updates.latest"></span><b id="upd-latest"></b>
+        </div>
+        <div class="inline">
+          <button class="btn primary" id="upd-check"><img src="/media/icons/png/refresh_white_64.png" alt="" /><span data-i18n="updates.check"></span></button>
+          <button class="btn" id="upd-install" hidden><img src="/media/icons/png/download_white_64.png" alt="" /><span id="upd-install-label"></span></button>
+          <button class="btn" id="upd-launcher" hidden><img src="/media/icons/png/download_white_64.png" alt="" /><span data-i18n="updates.installLauncher"></span></button>
+          <button class="btn" id="upd-releases"><img src="/media/icons/png/external-link_white_64.png" alt="" /><span data-i18n="updates.viewReleases"></span></button>
+        </div>
+        <p class="note" id="upd-result" hidden></p>
+        <div class="panel" id="upd-local-panel" hidden>
+          <h2 data-i18n="updates.localTitle"></h2>
+          <p class="muted" id="upd-local-text"></p>
+          <div class="inline">
+            <button class="btn" id="upd-rebuild" hidden><span id="upd-rebuild-label"></span></button>
+            <button class="btn" id="upd-restore" hidden><span id="upd-restore-label"></span></button>
+          </div>
+        </div>
+        <p class="note" data-i18n="updates.safeNote"></p>
+        <div class="panel" id="upd-notes-panel" hidden><h2 data-i18n="updates.notes"></h2><pre id="upd-notes"></pre></div>
+      </section>
+
+      <!-- About -->
+      <section class="page form" id="page-about">
+        <h1 data-i18n="about.title"></h1>
+        <p class="lead" data-i18n="about.lead"></p>
+        <div class="kv">
+          <span data-i18n="about.launcherVersion"></span><b id="about-version"></b>
+          <span data-i18n="about.runtime"></span><b>LCSrecomp.exe · Direct3D 11</b>
+        </div>
+        <div class="inline"><button class="btn" id="about-repo"><img src="/media/icons/png/github_white_64.png" alt="" /><span data-i18n="about.repo"></span></button></div>
+        <div class="panel">
+          <h2 data-i18n="about.credits"></h2>
+          <ul class="credits">
+            <li><b>PS2Recomp</b> · GPL-3.0 <span class="muted" data-i18n="about.ps2recomp"></span></li>
+            <li><b>GTA: Vice City Stories PC port</b> · GPL-3.0 <span class="muted" data-i18n="about.reference"></span></li>
+            <li><b>SDL3</b> · zlib</li>
+            <li><b>FFmpeg</b> · LGPL-2.1</li>
+            <li><b>Dear ImGui, fmt, toml11, ELFIO, nlohmann/json</b> · MIT</li>
+            <li><b>zlib</b> · zlib</li>
+            <li><b>Tauri</b> · MIT / Apache-2.0</li>
+            <li><b>Inter, Bebas Neue</b> · SIL Open Font License 1.1</li>
+          </ul>
+          <p class="muted small" data-i18n="about.disclaimer"></p>
+        </div>
+      </section>
+
+      <!-- a build or an update takes the content area -->
+      <section class="task" id="task" hidden>
+        <div class="task-head">
+          <div><h2 id="task-title"></h2><p class="muted" id="task-sub"></p></div>
+          <button class="btn" id="task-hide"><span data-i18n="task.hide"></span></button>
+        </div>
+        <div class="task-body">
+          <div class="task-left">
+            <div class="ring"><svg width="200" height="200" viewBox="0 0 200 200"><circle class="ring-bg" cx="100" cy="100" r="88"/><circle class="ring-fg" id="task-arc" cx="100" cy="100" r="88"/></svg><div class="ring-num"><span id="task-pct"></span></div></div>
+            <p class="task-detail" id="task-detail"></p>
+            <div class="inline">
+              <button class="btn" id="task-cancel"><span data-i18n="install.cancel"></span></button>
+              <button class="btn" data-open="logs"><span data-i18n="home.openLog"></span></button>
+            </div>
+          </div>
+          <ol class="timeline" id="task-stages"></ol>
+        </div>
+        <div class="task-result" id="task-result" hidden>
+          <img id="task-result-icon" src="/media/status/ready_64.png" alt="" />
+          <div class="grow"><b id="task-result-title"></b><small id="task-result-text"></small></div>
+          <button class="btn primary" id="task-close"><span data-i18n="task.close"></span></button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="palette-dim" id="palette-dim" hidden></div>
+  <div class="palette" id="palette" hidden>
+    <input id="palette-input" autocomplete="off" spellcheck="false" />
+    <div id="palette-items"></div>
+  </div>
+  <div class="toasts" id="toasts"></div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
