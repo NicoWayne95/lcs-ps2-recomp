@@ -74,8 +74,17 @@ bool PSPadBackend::readState(int port, int /*slot*/, uint8_t *data, size_t size,
     {
         data[2] = data[3] = 0xFF;
         data[4] = data[5] = data[6] = data[7] = 0x80;
-        if (g_reader(data))
+        int gas = -1, brake = -1;
+        if (g_reader(data, gas, brake))
+        {
+            if (port == 0 && (modernDriving || classicDriving) && gas >= 0 && brake >= 0)
+            {
+                m_modernDriving = true;
+                m_gas = static_cast<uint8_t>(gas);
+                m_brake = static_cast<uint8_t>(brake);
+            }
             return true;
+        }
     }
 
     uint16_t btns = 0xFFFFu;

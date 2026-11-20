@@ -351,8 +351,12 @@ public:
     void processVIF1Data(const uint8_t *data, uint32_t sizeBytes);
     // [lcs-recomp] VIF1 MSCAL startPc as the interpreter runs it (TOP / DBF, MSCAL hooks, the VU1): for replaying a
     // recorded VIF stream (runtime/ps2_chain_observer.h)
-    void vu1Mscal(uint32_t startPc) { vu1MscalInternal(startPc, nullptr, false, nullptr, 0u); }
-    void vu1MscalInternal(uint32_t startPc, const ps2hle::ChainSegment *segment, bool survey, const uint8_t *data, uint32_t sizeBytes);
+    void vu1Mscal(uint32_t startPc, ps2hle::MscalBefore directDraw = nullptr)
+    {
+        vu1MscalInternal(startPc, nullptr, false, nullptr, 0u, directDraw);
+    }
+    void vu1MscalInternal(uint32_t startPc, const ps2hle::ChainSegment *segment, bool survey, const uint8_t *data, uint32_t sizeBytes,
+                          ps2hle::MscalBefore directDraw = nullptr);
     void processPendingTransfers();
     std::vector<uint32_t> consumeCompletedDmacCauses();
     // [lcs-recomp] whether consumeCompletedDmacCauses has anything: one load instead of the mutex (every 32-bit store asks)

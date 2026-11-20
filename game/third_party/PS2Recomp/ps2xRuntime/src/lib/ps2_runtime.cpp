@@ -1302,6 +1302,17 @@ bool PS2Runtime::initialize(const char *title)
             std::cerr << "Failed to create the window" << std::endl;
             return false;
         }
+        // Keep host presentation pacing separate from the guest FPS limit.
+        if (const char *value = std::getenv("LCS_HOST_HZ"))
+        {
+            char *end = nullptr;
+            const double hz = std::strtod(value, &end);
+            if (end != value && *end == '\0' && hz >= 24.0 && hz <= 360.0)
+            {
+                platform::setFrameRate(hz);
+                std::fprintf(stderr, "[lcs-present] host pacing requested at %.2f Hz\n", hz);
+            }
+        }
         // [lcs-recomp] "burst DIR N": the next N presented frames as DIR/burst_NNNN.png, one line each in DIR/burst.txt (the
         // shape shown and the renderer's batch) - a transition frame by frame (screenshots manage one every ~50 ms)
         ps2control::addCommand("burst", [](const std::string &args, ps2control::Reply reply) {

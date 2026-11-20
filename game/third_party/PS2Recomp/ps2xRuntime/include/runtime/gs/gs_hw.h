@@ -87,7 +87,7 @@ void gsHwSetHudClassifier(GSHwAnchorFn fn);
 // drop shadow (drawn as a dark silhouette). Called on the thread that processes GS packets; nullptr = off.
 struct GSHwGlyphHit
 {
-    float u[8], v[8], dx[8];
+    float u[8], v[8], dx[8], dy[8];
     bool shadow;
 };
 using GSHwGlyphFn = bool (*)(const float *xy, uint32_t count, GSHwGlyphHit &hit);

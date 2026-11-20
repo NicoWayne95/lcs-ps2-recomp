@@ -133,7 +133,8 @@ public:
     void writeRegister(uint8_t regAddr, uint64_t value);
     // [lcs-recomp] Packet-level HLE: write PRIM as the skipped kick's GIFtag would, then hand the draw to the backend.
     // False when the backend cannot draw it (nothing changed then).
-    bool submitNative(uint64_t prim, const GSNativeDraw &draw);
+    bool submitNative(uint64_t prim, const GSNativeDraw &draw,
+                      const std::shared_ptr<const std::vector<uint8_t>> *mesh = nullptr);
 
     const uint8_t *lockDisplaySnapshot(uint32_t &outSize);
     void unlockDisplaySnapshot();

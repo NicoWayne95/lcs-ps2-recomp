@@ -37,3 +37,5 @@ THIRD-PARTY LIBRARIES
 SDL3 (zlib) · Dear ImGui (MIT) · fmt (MIT) · toml11 (MIT) · ELFIO (MIT) · nlohmann/json (MIT) · rabbitizer (MIT) · libdwarf (LGPL-2.1) · zlib (zlib) · FFmpeg (LGPL-2.1, shared libraries)
 
 Launcher: Tauri (MIT / Apache-2.0) · Inter and Bebas Neue fonts (SIL Open Font License 1.1)
+
+Input prompt icons by Kenney (CC0). https://kenney.nl/assets/input-prompts

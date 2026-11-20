@@ -422,7 +422,8 @@ void PS2Memory::submitVif1DirectData(const uint8_t *data, uint32_t qwCount, bool
 
 // [lcs-recomp] MSCAL: TOP / ITOP from TOPS / ITOPS, the double buffer flipped, then the HLE hooks / the VU1 (shared by the
 // interpreter and PS2Memory::vu1Mscal)
-void PS2Memory::vu1MscalInternal(uint32_t startPC, const ps2hle::ChainSegment *segment, bool survey, const uint8_t *data, uint32_t sizeBytes)
+void PS2Memory::vu1MscalInternal(uint32_t startPC, const ps2hle::ChainSegment *segment, bool survey, const uint8_t *data, uint32_t sizeBytes,
+                                ps2hle::MscalBefore directDraw)
 {
     const uint32_t runTop = vif1_regs.tops & 0x3FFu;
     const uint32_t runItop = vif1_regs.itops & 0x3FFu;
@@ -462,7 +463,7 @@ void PS2Memory::vu1MscalInternal(uint32_t startPC, const ps2hle::ChainSegment *s
         std::fprintf(stderr, "[q58] changed between MSCALs (after pc %04x %s): %08x %08x %08x %08x, now MSCAL %04x\n", q58LastPc,
                      q58LastHandled ? "native" : "VU1", q58Before[0], q58Before[1], q58Before[2], q58Before[3], startPC);
     }
-    const bool handled = hleBefore && hleBefore(hle);
+    const bool handled = (directDraw && directDraw(hle)) || (hleBefore && hleBefore(hle));
     if (!handled && m_vu1MscalCallback)
         m_vu1MscalCallback(startPC, runTop, runItop);
     uint32_t q58After[4];

@@ -17,7 +17,8 @@ public:
     // [lcs-recomp] The game's own input mapping (src/game/ref_input.cpp: the player's bindings) fills the report
     // instead of the built-in one below when set: data[2..3] buttons (active low), data[4..7] rx, ry, lx, ly. Game
     // thread; false falls back to the built-in mapping.
-    using Reader = bool (*)(uint8_t *data);
+    // The reader may also provide a pair of analog driving pedal values (0..255).
+    using Reader = bool (*)(uint8_t *data, int &gas, int &brake);
     static void setReader(Reader reader);
 
     // [lcs-recomp] The game's motor levels from scePadSetActDirect (act 0: small motor on / off, act 1: large motor

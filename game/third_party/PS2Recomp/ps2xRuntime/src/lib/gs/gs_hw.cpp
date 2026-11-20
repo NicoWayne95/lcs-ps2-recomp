@@ -1711,13 +1711,22 @@ namespace
         // sky, as if their exported depth lost to any written one; NVIDIA and WARP drew them. The rasterised depth is
         // the plain path every driver takes, and better defined where the hardware clips a native triangle (its
         // noperspective depth attribute at the new vertices is the driver's choice)
+        static bool quantizeGsDepth()
+        {
+            static const bool enabled = [] {
+                const char *value = std::getenv("LCS_GS_INTEGER_DEPTH");
+                return value && std::strcmp(value, "1") == 0;
+            }();
+            return enabled;
+        }
+
         bool shaderDepth() const
         {
             static const int forced = [] {
                 const char *e = std::getenv("PS2X_HW_SHADER_DEPTH");
                 return e && *e ? (*e == '0' ? 0 : 1) : -1;
             }();
-            return forced == 1;
+            return forced == 1 || quantizeGsDepth();
         }
 
         rhi::Pipeline &drawPipeline(const GsBlend &b, uint8_t mask, bool depthTest, uint32_t ztst, bool zwrite, uint8_t mode,
@@ -2632,6 +2641,10 @@ namespace
             }
 
             DrawConstants c{};
+            if (depthOn && quantizeGsDepth())
+                c.filterDest[2] = s.zpsm == GS_PSM_Z32 ? 4294967296.0f
+                                : s.zpsm == GS_PSM_Z16 || s.zpsm == GS_PSM_Z16S ? 65536.0f
+                                : 16777216.0f;
             c.targetRtFix[0] = targetW;
             c.targetRtFix[1] = targetH;
             c.targetRtFix[2] = rtScale.x;
@@ -3237,16 +3250,25 @@ namespace
             s.tfx = 0; // modulate
             s.tcc = 1;
             s.linear = 1;
-            s.wms = s.wmt = 1; // clamp
-            s.minu = s.minv = 0;
-            s.maxu = static_cast<uint16_t>(g_glyphAtlas.w - 1u);
-            s.maxv = static_cast<uint16_t>(g_glyphAtlas.h - 1u);
+            // The classifier supplies UVs at the centres of the outer texels
+            // of this cell. Restrict bilinear taps to the same cell.
+            const auto u = std::minmax_element(hit.u, hit.u + n);
+            const auto v = std::minmax_element(hit.v, hit.v + n);
+            const auto texel = [](float uv, uint16_t size) {
+                return static_cast<uint16_t>(std::clamp(static_cast<int>(uv * size), 0, int(size) - 1));
+            };
+            s.wms = s.wmt = 2u; // REGION_CLAMP
+            s.minu = texel(*u.first, s.tw);
+            s.maxu = texel(*u.second, s.tw);
+            s.minv = texel(*v.first, s.th);
+            s.maxv = texel(*v.second, s.th);
             for (uint32_t i = 0; i < n; ++i)
             {
                 out[i].s = hit.u[i];
                 out[i].t = hit.v[i];
                 out[i].q = 1.0f;
                 out[i].x += hit.dx[i];
+                out[i].y += hit.dy[i];
                 const uint8_t c = hit.shadow ? 0u : 128u;
                 out[i].r = out[i].g = out[i].b = c;
             }
@@ -3401,6 +3423,7 @@ namespace
                         xy[2 * i + 1] = batch->vertices[i].y - ofy;
                     }
                     anchor = classify(xy, count);
+
                     if (anchor & GSHwAnchorMenu) // [lcs-recomp] the game's menu: the frame may switch to 4:3 at once
                     {
                         m_frame->menu = true;
@@ -3408,9 +3431,55 @@ namespace
                     }
                     hud = anchor != GSHwAnchorNone && g_hudLayer.load(std::memory_order_relaxed);
                 }
+                // The radar uses a tight lower-left GS scissor. Map and mask packets can
+                // arrive without Im2D vertices or on another GIF path; use the scissor
+                // before the layout chooses a destination or falls back to the centre.
+                const bool lowerLeftClip = s.scx0 <= 104u && s.scx1 <= 235u &&
+                                           s.scx1 >= s.scx0 + 40u && s.scy0 >= 285u &&
+                                           s.scy1 <= 447u && s.scy1 >= s.scy0 + 40u;
+                // Keep the fixed radar draws at their native left coordinates. The depth
+                // mask, ring and blips are authored in that space, so a second horizontal
+                // squeeze on the map alone cuts off its right side.
+                bool radarDraw = false;
+                if (classify && !frameEffect && gsDrawSourcePath(source) == 2u &&
+                    s.scx0 == 0u && s.scx1 == 639u && s.scy0 == 0u && s.scy1 == 447u &&
+                    x0 >= 17.0f && x1 <= 132.0f)
+                {
+                    float y0 = out[0].y, y1 = out[0].y;
+                    for (uint32_t i = 1; i < n; ++i)
+                    {
+                        y0 = std::min(y0, out[i].y);
+                        y1 = std::max(y1, out[i].y);
+                    }
+                    // Textured radar pieces may reach here as clipped triangles,
+                    // so both halves must retain the radar transform independently.
+                    const bool radarArea = y0 >= 330.0f && y1 <= 433.0f;
+                    const bool radarDepthMask = s.zte && !s.zmsk && !s.tme;
+                    radarDraw = radarArea && ((far && s.tme) || radarDepthMask);
+                }
+                if (classify && !frameEffect && (lowerLeftClip || radarDraw) && !gsHwMenuActive())
+                {
+                    anchor = GSHwAnchorStretch;
+                    hud = g_hudLayer.load(std::memory_order_relaxed);
+                }
+                // The clock, bars, weapon and wanted stars occupy this corner in the guest's 640x448 space.
+                // Their Screen Edges transform must not depend on a frame's temporary vertex-anchor map.
+                bool statusHud = false;
+                if (classify && widescreen && far && !s.texIsRt && !gsHwMenuActive() &&
+                    gsDrawSourcePath(source) == 2u && x0 >= 472.0f && x1 <= 638.0f)
+                {
+                    statusHud = true;
+                    for (uint32_t i = 0; i < n; ++i)
+                        statusHud = statusHud && out[i].y >= 10.0f && out[i].y <= 127.0f;
+                }
+                if (statusHud)
+                {
+                    anchor = GSHwAnchorRight;
+                    hud = g_hudLayer.load(std::memory_order_relaxed);
+                }
                 if (anchor == GSHwAnchorNone && far && !s.texIsRt && !(x0 <= 1.0f && x1 >= 639.0f) && wide)
                     anchor = GSHwAnchorCentre;
-                if (anchor != GSHwAnchorNone && anchor != GSHwAnchorStretch && (hud ? widescreen : wide))
+                if (anchor != GSHwAnchorNone && anchor != GSHwAnchorStretch && (statusHud || (hud ? widescreen : wide)))
                 {
                     // x' = pivot + (x - pivot) * squeeze: the pivot stays where it is (an edge or the middle)
                     const float pivot = anchor == GSHwAnchorLeft ? 0.0f : anchor == GSHwAnchorRight ? 640.0f : 320.0f;
@@ -3436,6 +3505,48 @@ namespace
                     }
                 }
             }
+            static const bool traceRadar = std::getenv("LCS_TRACE_RADAR_GS") != nullptr;
+            if (traceRadar && classify && widescreen && !gsHwMenuActive())
+            {
+                float y0 = out[0].y, y1 = out[0].y;
+                for (uint32_t i = 1; i < n; ++i)
+                {
+                    y0 = std::min(y0, out[i].y);
+                    y1 = std::max(y1, out[i].y);
+                }
+                const bool clipped = s.scx1 < 340u && s.scy0 >= 210u;
+                const bool nearRadar = x0 < 180.0f && x1 > 10.0f && y0 < 442.0f && y1 > 305.0f &&
+                                       x1 - x0 < 520.0f && y1 - y0 < 370.0f;
+                if (clipped || (nearRadar && (far || hud || s.texIsRt || gsDrawSourcePath(source) == 2u)))
+                {
+                    // Deduplicate by draw state, so a tile fan cannot use the whole budget.
+                    struct RadarTraceKey
+                    {
+                        uint16_t x0, y0, x1, y1;
+                        uint32_t fbp, zbp;
+                        uint64_t tex;
+                        uint8_t path, kind, pivot;
+                    };
+                    const RadarTraceKey key{s.scx0, s.scy0, s.scx1, s.scy1, s.fbp, s.zbp, s.texKey,
+                                            static_cast<uint8_t>(gsDrawSourcePath(source)),
+                                            static_cast<uint8_t>((hud ? 1u : 0u) | (far ? 2u : 0u) | (batch ? 4u : 0u)),
+                                            static_cast<uint8_t>(hudPivot / 320.0f)};
+                    static std::vector<RadarTraceKey> seen;
+                    if (seen.size() < 128u && std::none_of(seen.begin(), seen.end(), [&](const RadarTraceKey &k) {
+                            return k.x0 == key.x0 && k.y0 == key.y0 && k.x1 == key.x1 && k.y1 == key.y1 &&
+                                   k.fbp == key.fbp && k.zbp == key.zbp && k.tex == key.tex &&
+                                   k.path == key.path && k.kind == key.kind && k.pivot == key.pivot;
+                        }))
+                    {
+                        seen.push_back(key);
+                        std::fprintf(stderr, "[radar-gs] verts=%.1f,%.1f-%.1f,%.1f sc=%u,%u-%u,%u fbp=%u fbw=%u zbp=%u zte=%u tex=%llx rt=%u path=%u batch=%u far=%u layer=%u pivot=%.0f squeeze=%.3f\n",
+                                     x0, y0, x1, y1, unsigned(s.scx0), unsigned(s.scy0), unsigned(s.scx1), unsigned(s.scy1),
+                                     unsigned(s.fbp), unsigned(s.fbw), unsigned(s.zbp), unsigned(s.zte),
+                                     static_cast<unsigned long long>(s.texKey), unsigned(s.texIsRt), gsDrawSourcePath(source),
+                                     unsigned(batch != nullptr), unsigned(far), unsigned(hud), hudPivot, hudSqueeze);
+                    }
+                }
+            }
             if (bookkeeping)
             {
                 if (s.zte && s.ztst != 1u && s.zbp != s.fbp)
@@ -3452,6 +3563,16 @@ namespace
             {
                 f.cmds.push_back({cmdType, static_cast<uint32_t>(f.draws.size())});
                 f.draws.push_back({s, static_cast<uint32_t>(f.vertices.size()), 0u, source, hudPivot, hudSqueeze});
+            }
+            // The two garage decals overlap the facade. Apply their depth offset before upload
+            // so the normal GPU depth test and early rejection stay active.
+            if (!hud && s.zte && s.ztst == 2u && s.fbp == 140u && s.zbp == 280u &&
+                ((s.texKey == 0x5e2e010dd2a647f7ull && s.ate && s.atst == 5u && s.aref == 120u) ||
+                 (s.texKey == 0x6c5a9d8b9700b8fdull && s.ate && s.atst == 1u)))
+            {
+                constexpr float decalBias = 16.0f / 16777216.0f;
+                for (uint32_t i = 0; i < n; ++i)
+                    out[i].z = std::min(out[i].z + decalBias, 1.0f);
             }
             f.vertices.insert(f.vertices.end(), out, out + n);
             f.draws.back().count += n;

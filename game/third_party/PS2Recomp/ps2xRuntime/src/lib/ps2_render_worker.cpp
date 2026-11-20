@@ -227,6 +227,17 @@ namespace ps2_render_worker
 
         std::atomic<uint64_t> gsFrameWaitNs{0u};
 
+        thread_local void (*t_gsFlush)() = nullptr;
+
+        void flushGsBatch()
+        {
+            if (auto flush = t_gsFlush)
+            {
+                t_gsFlush = nullptr;
+                flush();
+            }
+        }
+
         void run()
         {
             ps2perf::registerHostThread(ps2perf::HostThread::Render);
@@ -262,6 +273,7 @@ namespace ps2_render_worker
                     if (reported++ < 20)
                         std::fprintf(stderr, "[render-worker] work failed (unknown exception)\n");
                 }
+                flushGsBatch();
                 item.work = nullptr; // its captures (chain buffers) go outside the lock
                 const uint64_t elapsed = nowNs() - start;
                 ps2perf::addWorkerTime(elapsed);
@@ -416,8 +428,14 @@ namespace ps2_render_worker
         return t_onGsStage;
     }
 
+    void gsDeferFlush(void (*flush)())
+    {
+        t_gsFlush = flush;
+    }
+
     uint8_t *gsReserve(const GsCommand &command)
     {
+        flushGsBatch();
         GsStage &g = gsState();
         gsStart(g);
         const uint64_t need = kGsHeaderBytes + ((command.bytes + kGsAlign - 1u) & ~(kGsAlign - 1u));
@@ -483,6 +501,7 @@ namespace ps2_render_worker
     {
         if (t_onGsStage)
             return;
+        flushGsBatch();
         GsStage &g = gsState();
         g.drains.fetch_add(1u, std::memory_order_relaxed);
         const uint64_t target = g.tail.load(std::memory_order_seq_cst);

@@ -75,6 +75,8 @@ namespace ps2_render_worker
     // queue - the GS stage has been drained, call the GS directly.
     uint8_t *gsReserve(const GsCommand &command);
     void gsSend();
+    // Publish a producer-side batch before the next GS command, drain or end of the worker job.
+    void gsDeferFlush(void (*flush)());
     // `work` on the GS stage in order with the commands, or at once without it; frameEnd: a displayed frame's end (the
     // worker waits rather than get more than one frame ahead of the GS stage)
     void runOnGsStage(std::function<void()> work, bool frameEnd = false);

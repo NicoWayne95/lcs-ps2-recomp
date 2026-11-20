@@ -178,7 +178,105 @@ namespace
         kGsPackedKick = 2,
         kGsNative = 3,
         kGsRegister = 4,
+        kGsSharedMesh = 5,
+        kGsCompactNative = 6,
+        kGsWorldBatch = 7,
     };
+    struct SharedMeshCommand
+    {
+        GSNativeDraw draw;
+        std::shared_ptr<const std::vector<uint8_t>> vertices;
+    };
+
+    struct NativeParameters
+    {
+        uint64_t meshKey;
+        uint32_t kind, vertexStride, vertexCount, drawCount, constantCount;
+        bool transient;
+
+        explicit NativeParameters(const GSNativeDraw &draw)
+            : meshKey(draw.meshKey), kind(draw.kind), vertexStride(draw.vertexStride),
+              vertexCount(draw.vertexCount), drawCount(draw.drawCount), constantCount(draw.constantCount),
+              transient(draw.transient) {}
+
+        void unpack(GSNativeDraw &draw, const void *vertices, const void *constants) const
+        {
+            draw.meshKey = meshKey;
+            draw.kind = kind;
+            draw.vertexStride = vertexStride;
+            draw.vertexCount = vertexCount;
+            draw.drawCount = drawCount;
+            draw.constantCount = constantCount;
+            draw.transient = transient;
+            draw.vertices = vertices;
+            std::memcpy(draw.constants, constants, constantCount * sizeof(float));
+        }
+    };
+
+    constexpr uint32_t kWorldConstants = 60;
+    constexpr uint32_t kWorldBatchSize = 8;
+    struct WorldDraw
+    {
+        uint64_t prim;
+        NativeParameters params;
+        std::shared_ptr<const std::vector<uint8_t>> vertices;
+        float constants[kWorldConstants];
+    };
+    thread_local std::vector<WorldDraw> t_worldBatch;
+    thread_local ps2_render_worker::GsCommand t_worldCommand;
+
+    void flushWorldBatch()
+    {
+        if (t_worldBatch.empty())
+            return;
+        t_worldCommand.a = t_worldBatch.size();
+        t_worldCommand.bytes = static_cast<uint32_t>(t_worldBatch.size() * sizeof(WorldDraw));
+        const uint32_t csr = _mm_getcsr();
+        _mm_setcsr(t_worldCommand.csr);
+        auto *payload = ps2_render_worker::gsReserve(t_worldCommand);
+        _mm_setcsr(csr);
+        for (auto &entry : t_worldBatch)
+        {
+            std::construct_at(reinterpret_cast<WorldDraw *>(payload), std::move(entry));
+            payload += sizeof(WorldDraw);
+        }
+        t_worldBatch.clear();
+        ps2_render_worker::gsSend();
+    }
+
+    bool queueWorldDraw(uint64_t prim, const GSNativeDraw &draw,
+                        const std::shared_ptr<const std::vector<uint8_t>> &mesh)
+    {
+        uint32_t address, bytes;
+        gsHwTakeUploadSource(address, bytes);
+        if (bytes)
+        {
+            gsHwSetUploadSource(address, bytes);
+            return false; // a draw with its own upload context is queued individually
+        }
+        const uint32_t csr = _mm_getcsr();
+        if (!t_worldBatch.empty() &&
+            (t_worldCommand.gifPath != g_currentGifPath || t_worldCommand.producer != g_path1Producer ||
+             t_worldCommand.csr != csr || t_worldBatch.size() == kWorldBatchSize))
+        {
+            ps2_render_worker::gsDeferFlush(nullptr);
+            flushWorldBatch();
+        }
+        if (t_worldBatch.empty())
+        {
+            t_worldBatch.reserve(kWorldBatchSize);
+            t_worldCommand.type = kGsWorldBatch;
+            t_worldCommand.gifPath = g_currentGifPath;
+            t_worldCommand.producer = g_path1Producer;
+            t_worldCommand.csr = csr;
+            ps2_render_worker::gsDeferFlush(flushWorldBatch);
+        }
+        WorldDraw entry{prim, NativeParameters(draw), mesh, {}};
+        std::memcpy(entry.constants, draw.constants, sizeof(entry.constants));
+        t_worldBatch.push_back(std::move(entry));
+        return true;
+    }
+
     GS *g_stageGs = nullptr;
 
     void gsStageHandler(const ps2_render_worker::GsCommand &c, const uint8_t *payload)
@@ -205,6 +303,46 @@ namespace
             gs.submitNative(c.b, draw);
             break;
         }
+        case kGsCompactNative:
+        {
+            NativeParameters params(GSNativeDraw{});
+            std::memcpy(&params, payload, sizeof(params));
+            const auto *constants = payload + sizeof(params);
+            GSNativeDraw draw;
+            params.unpack(draw, c.a ? constants + params.constantCount * sizeof(float) : nullptr, constants);
+            gs.submitNative(c.b, draw);
+            break;
+        }
+        case kGsWorldBatch:
+        {
+            auto *entry = const_cast<uint8_t *>(payload);
+            // Destroy the queued owners even if a backend draw throws.
+            struct Cleanup
+            {
+                uint8_t *data;
+                uint64_t count;
+                ~Cleanup()
+                {
+                    for (uint64_t i = 0; i < count; ++i)
+                        std::destroy_at(reinterpret_cast<WorldDraw *>(data + i * sizeof(WorldDraw)));
+                }
+            } cleanup{entry, c.a};
+            for (uint64_t i = 0; i < c.a; ++i, entry += sizeof(WorldDraw))
+            {
+                const auto &queued = *reinterpret_cast<const WorldDraw *>(entry);
+                GSNativeDraw draw;
+                queued.params.unpack(draw, queued.vertices->data(), queued.constants);
+                gs.submitNative(queued.prim, draw);
+            }
+            break;
+        }
+        case kGsSharedMesh:
+        {
+            auto *queued = reinterpret_cast<SharedMeshCommand *>(const_cast<uint8_t *>(payload));
+            gs.submitNative(c.b, queued->draw);
+            std::destroy_at(queued);
+            break;
+        }
         case kGsRegister:
             gs.writeRegister(static_cast<uint8_t>(c.a), c.b);
             break;
@@ -216,11 +354,12 @@ namespace
     // On the worker: the command and its data to the GS stage. false: too large for the queue (the stage has been
     // drained - the caller does the work itself).
     bool toGsStage(uint32_t type, const void *data, uint32_t bytes, uint64_t a, uint64_t b, const void *extra = nullptr,
-                   uint32_t extraBytes = 0u)
+                   uint32_t extraBytes = 0u, const SharedMeshCommand *sharedMesh = nullptr,
+                   const void *vertices = nullptr, uint32_t vertexBytes = 0u)
     {
         ps2_render_worker::GsCommand c;
         c.type = type;
-        c.bytes = bytes + extraBytes;
+        c.bytes = bytes + extraBytes + vertexBytes;
         c.a = a;
         c.b = b;
         c.gifPath = g_currentGifPath;
@@ -233,10 +372,14 @@ namespace
                 gsHwSetUploadSource(c.uploadAddress, c.uploadBytes);
             return false;
         }
-        if (bytes)
+        if (sharedMesh)
+            std::construct_at(reinterpret_cast<SharedMeshCommand *>(p), *sharedMesh);
+        else if (bytes)
             std::memcpy(p, data, bytes);
         if (extraBytes)
             std::memcpy(p + bytes, extra, extraBytes);
+        if (vertexBytes)
+            std::memcpy(p + bytes + extraBytes, vertices, vertexBytes);
         ps2_render_worker::gsSend();
         return true;
     }
@@ -2180,7 +2323,8 @@ void GS::WriteVram(uint32_t psm, uint32_t base, uint32_t bw, uint32_t x, uint32_
         m_backend->WriteVram(psm, base, bw, x, y, value);
 }
 
-bool GS::submitNative(uint64_t prim, const GSNativeDraw &draw)
+bool GS::submitNative(uint64_t prim, const GSNativeDraw &draw,
+                      const std::shared_ptr<const std::vector<uint8_t>> *mesh)
 {
     if (ps2_render_worker::gsStage()) // [lcs-recomp] PRIM written either way, as below
     {
@@ -2192,8 +2336,30 @@ bool GS::submitNative(uint64_t prim, const GSNativeDraw &draw)
                 writeRegister(GS_REG_PRIM, prim);
             return false;
         }
+        // Keep the recorded vertices alive until the stage has checked its GPU cache.
+        // On a cache hit only the draw parameters cross the ring.
+        static const bool optimizedQueue = [] {
+            const char *value = std::getenv("LCS_GS_DRAW_BATCH");
+            return !value || *value != '0';
+        }();
+        if (mesh)
+        {
+            if (optimizedQueue && draw.kind == GSNativeDraw::LcsWorld && !draw.transient &&
+                draw.constantCount == kWorldConstants && queueWorldDraw(prim, draw, *mesh))
+                return true;
+            const SharedMeshCommand command{draw, *mesh};
+            if (toGsStage(kGsSharedMesh, nullptr, sizeof(command), 0u, prim, nullptr, 0u, &command))
+                return true;
+        }
         const uint32_t vertexBytes = draw.vertices ? draw.vertexCount * draw.vertexStride : 0u;
-        if (toGsStage(kGsNative, &draw, sizeof(GSNativeDraw), draw.vertices ? 1u : 0u, prim, draw.vertices, vertexBytes))
+        if (optimizedQueue)
+        {
+            const NativeParameters params(draw);
+            if (toGsStage(kGsCompactNative, &params, sizeof(params), draw.vertices ? 1u : 0u, prim,
+                          draw.constants, draw.constantCount * sizeof(float), nullptr, draw.vertices, vertexBytes))
+                return true;
+        }
+        else if (toGsStage(kGsNative, &draw, sizeof(GSNativeDraw), draw.vertices ? 1u : 0u, prim, draw.vertices, vertexBytes))
             return true;
     }
     std::lock_guard<ps2x::RecursiveMutex> lock(m_stateMutex);
