@@ -692,6 +692,11 @@ The goal is to provide the alternative blue appearance as an optional feature.
 ---
 
 ## Roadmap
+## Roadmap
+
+<p align="center">
+  <img src="docs/images/roadmap-banner.png" alt="LCS Recomp Roadmap" width="100%">
+</p>
 
 The roadmap reflects the current development direction.
 
