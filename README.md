@@ -692,10 +692,9 @@ The goal is to provide the alternative blue appearance as an optional feature.
 ---
 
 ## Roadmap
-## Roadmap
 
 <p align="center">
-  <img src="docs/images/roadmap-banner.png" alt="LCS Recomp Roadmap" width="100%">
+  <img src="docs/features/roadmap-banner.png" alt="LCS Recomp Roadmap" width="100%">
 </p>
 
 The roadmap reflects the current development direction.
@@ -972,18 +971,6 @@ Explore Liberty City through screenshots captured during development.
 
 <p align="center">
   <a href="docs/GALLERY.md"><strong>View the full screenshot gallery</strong></a>
-</p>
-
-### Development Journey
-
-The original visual roadmap illustrates earlier milestones and the project's initial development vision.
-
-Some information shown in the image may be outdated.
-
-For current development priorities, refer to the Roadmap section above.
-
-<p align="center">
-  <img src="LCS_roadmap.png" alt="LCS Recomp historical development roadmap" width="1200">
 </p>
 
 ---
