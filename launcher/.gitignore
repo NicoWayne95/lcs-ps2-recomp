@@ -1,0 +1,12 @@
+﻿/node_modules/
+/dist/
+/build/
+/target/
+/out/
+/coverage/
+*.log
+.env
+.env.*
+*.pem
+*.key
+*.pfx
