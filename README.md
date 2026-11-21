@@ -122,7 +122,7 @@ The Quality of Life Update focuses on improving the actual gameplay experience w
 | :--- | :--- |
 | **Rendering Architecture** | Optimized native world render path and persistent GPU vertex buffers |
 | **Rendering Pipeline** | Reduced GS processing overhead and optimized draw submission |
-| **CPU Compatibility** | AVX1 replaces AVX2 as the standard game build target |
+| **CPU Compatibility** | AVX1 is enforced for launcher builds starting with the 0.2.2 hotfix |
 | **Controller Support** | Improved Xbox and PlayStation compatibility |
 | **Input Switching** | Seamless controller and keyboard/mouse switching during gameplay |
 | **DualShock 3** | Native pressure-sensitive acceleration, braking and steering |
@@ -270,23 +270,11 @@ The Render Worker, Graphics Synthesizer and Emotion Engine can still place signi
 >
 > They do not guarantee higher FPS in every scene or on every hardware configuration.
 
-### AVX1 CPU Compatibility
+### 0.2.2 AVX1 Hotfix
 
-**The Windows game build now targets AVX1 instead of requiring AVX2 as its standard instruction set.**
+In 0.2.1, the launcher could build the game with AVX2 enabled. On older CPUs that support AVX1 only, this could cause a startup crash (`0xC000001D`). This hotfix makes launcher builds use AVX1, even if a previous build cached the AVX2 setting.
 
-This change is intended to improve compatibility with older processors that support AVX but not AVX2.
-
-- Updated the Windows build target to AVX1.
-- Reduced reliance on AVX2 as the baseline requirement.
-- Successfully compiled AVX1 development builds.
-- Completed build integrity verification.
-
-> [!IMPORTANT]
-> **Community testing is still required.**
->
-> Compatibility with every AVX1-only processor has not yet been confirmed.
->
-> If your CPU supports AVX but not AVX2, please test LCS Recomp and share your results.
+**Already installed?** Open your existing launcher and select **Update**. The update rebuilds the game and keeps your ISO, saves and settings. There’s no need to clear the build cache.
 
 ### Vehicle Reflections
 

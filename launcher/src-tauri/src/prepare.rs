@@ -522,7 +522,7 @@ pub fn prepare(c: &Ctx) -> Result<(), String> {
     let sdeps = source.join("deps");
     let mut args = vec![
         "-S".into(), s(&source), "-B".into(), s(&build), "-G".into(), "Ninja".into(),
-        "-DCMAKE_BUILD_TYPE=Release".into(), "-DPS2X_ENABLE_AGRESSIVE_LOGS=OFF".into(), "-DPS2X_LTO=OFF".into(),
+        "-DCMAKE_BUILD_TYPE=Release".into(), "-DPS2X_CPU=AVX".into(), "-DPS2X_ENABLE_AGRESSIVE_LOGS=OFF".into(), "-DPS2X_LTO=OFF".into(),
         "-DLCS_BUILD_TOOLS=OFF".into(), "-DLCS_DIAGNOSTICS=OFF".into(), "-DLCS_MENU_VIDEO=ON".into(),
         "-DLCS_RUNTIME_DEBUG_INFO=ON".into(), // the crash handler needs dbghelp (linked with the debug info)
         format!("-DLCS_GENERATED_DIR={}", s(&ee)),

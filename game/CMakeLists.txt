@@ -9,8 +9,11 @@ set(LCS_GENERATED_DIR "${CMAKE_SOURCE_DIR}/generated/ee" CACHE PATH "Recompiled 
 
 set(PS2X_LTO "THIN" CACHE STRING "Link-time optimisation for the game: THIN (default, the game to play), OFF (quick dev builds), FULL")
 set(PS2X_PGO "" CACHE STRING "Profile-guided optimisation: empty (off), GEN (instrumented), or a .profdata path (tools/build.py --opt)")
-set(PS2X_CPU "AVX2" CACHE STRING "The CPU the build runs on: AVX2 (Haswell / Zen and newer, the default), AVX (Sandy / Ivy Bridge, Bulldozer) or SSE4 (no AVX); tools/build.py picks it from this PC")
+set(PS2X_CPU "AVX" CACHE STRING "The CPU the build runs on: AVX (default, Sandy Bridge / Bulldozer and newer), AVX2 (Haswell / Zen and newer), or SSE4 (no AVX)")
 set_property(CACHE PS2X_CPU PROPERTY STRINGS AVX2 AVX SSE4)
+# The portable kit pins its baseline, including updates from older launchers
+# that reuse a CMake cache originally configured with AVX2.
+include("${CMAKE_CURRENT_SOURCE_DIR}/lcs-release-cpu.cmake" OPTIONAL)
 option(LCS_BUILD_TOOLS "Build the PS2Recomp recompiler/analyzer" ON)
 # [lcs] ON: the diagnosis build (build/diag, every diagnostic hook and log line); OFF: the performance build
 # (build/release) without the pure diagnostic hooks and the log lines that run during play (src/lcs/lcs_diag.h).

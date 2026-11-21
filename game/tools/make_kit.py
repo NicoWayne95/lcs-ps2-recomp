@@ -94,6 +94,8 @@ def main(out, lcs_recomp, guest, uploads):
     src = os.path.join(out, "source")
     os.makedirs(src)
     shutil.copy2(os.path.join(ROOT, "CMakeLists.txt"), src)
+    with open(os.path.join(src, "lcs-release-cpu.cmake"), "w", encoding="utf-8", newline="\n") as cpu:
+        cpu.write('set(PS2X_CPU "AVX" CACHE STRING "CPU target for launcher builds" FORCE)\n')
     copy_tree(os.path.join(ROOT, "src"), os.path.join(src, "src"), skip={"__pycache__"})
     copy_tree(os.path.join(ROOT, "third_party", "PS2Recomp"), os.path.join(src, "third_party", "PS2Recomp"))
     copy_tree(os.path.join(ROOT, "deps"), os.path.join(src, "deps"), skip={"__pycache__", ".git"})
