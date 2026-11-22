@@ -75,7 +75,7 @@ This release reduces CPU-side memory-copy overhead for eligible rendering operat
 | Information | Details |
 | :--- | :--- |
 | Current Release | **v0.2.4 — HUD Fixes & Rendering Updates** |
-| Launcher Included | **v0.2.2** (in the v0.2.4 portable package) |
+| Launcher Included | **v0.2.4** |
 | Release Status | Beta |
 | Platform | Windows 10 / 11 (64-bit) |
 | Renderer | DirectX 11 |
