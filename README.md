@@ -38,24 +38,27 @@
 
 ---
 
+
+
 ## Welcome back to Liberty City!
 
-**LCS Recomp** is an independent fan project bringing the PlayStation 2 version of Grand Theft Auto: Liberty City Stories to PC through static recompilation and a custom native runtime.
+**LCS Recomp** is an independent fan project bringing the PlayStation 2 version of Grand Theft Auto: Liberty City Stories to PC through static recompilation and a custom native runtime. The goal is to preserve the original game's atmosphere, gameplay and visual identity while introducing optional improvements for modern PC hardware.
 
-The project aims to preserve the original game's atmosphere, gameplay and visual identity while introducing optional improvements for modern PC hardware.
+> [!IMPORTANT]
+> **LCS Recomp is a solo-developed project, not a team effort.**
+>
+> I'm developing and maintaining this project entirely on my own in my spare time, covering everything from reverse engineering and runtime development to debugging, optimization and releases. This is my first recompilation project of this kind, so I'm still learning along the way. The project builds upon existing open-source work and uses AI-assisted development tools, but all development decisions, integration and testing remain my responsibility. Since this is a personal hobby project, progress and updates depend on the time I have available.
 
-Rather than replacing the original experience, the goal is to give players the freedom to choose between an authentic PlayStation 2 experience and an enhanced native PC experience.
-
-LCS Recomp is developed as a personal hobby project in my free time. It is my first recompilation project of this kind, and development is an ongoing learning process.
+Rather than replacing the original experience, I want to give players the choice between an authentic PlayStation 2 experience and an enhanced native PC experience.
 
 The game is prepared and recompiled locally using your own original PlayStation 2 game ISO. No original copyrighted game files are included.
 
-> [!IMPORTANT]
+> [!WARNING]
 > **LCS Recomp is currently in Public Beta.**
 >
-> Bugs, crashes, graphical issues, incomplete features and compatibility problems may still occur.
->
-> Development is ongoing, and not every gameplay feature has been fully validated.
+> Bugs, crashes, graphical issues and incomplete features may still occur. Development is ongoing, and not every gameplay feature has been fully validated.
+
+---
 
 ---
 
@@ -303,12 +306,6 @@ This change is intended to improve compatibility with older processors that supp
 - Successfully compiled AVX1 development builds.
 - Completed build integrity verification.
 
-> [!IMPORTANT]
-> **Community testing is still required.**
->
-> Compatibility with every AVX1-only processor has not yet been confirmed.
->
-> If your CPU supports AVX but not AVX2, please test LCS Recomp and share your results.
 
 ### Vehicle Reflections
 
