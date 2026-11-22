@@ -21,7 +21,7 @@
 
 <p align="center">
   <a href="#latest-release"><strong>Download</strong></a> ·
-  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.1">Release Notes</a> ·
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">Release Notes</a> ·
   <a href="#whats-new">What's New</a> ·
   <a href="#features">Features</a> ·
   <a href="#known-issues">Known Issues</a> ·
@@ -61,60 +61,71 @@ The game is prepared and recompiled locally using your own original PlayStation 
 
 ## Latest Release
 
-### v0.2.1 — Quality of Life Update
+### v0.2.4 — HUD Fixes & Rendering Updates
 
-**Released November 20, 2026**
+**Released November 21, 2026**
 
-Version 0.2.1 introduces significant gameplay improvements, high-FPS timing corrections, controller compatibility improvements and changes to the native rendering architecture.
+Version **0.2.4** improves radar and mission marker alignment, subtitle formatting, widescreen handling and the native rendering pipeline. It also adds 144, 180 and 240 FPS options and expands the performance profiling tools.
 
-The update also introduces AVX1 as the standard Windows game build target, with the goal of improving compatibility with older processors.
+This release reduces CPU-side memory-copy overhead for eligible rendering operations. Broader FPS gains are not guaranteed and performance work remains ongoing.
 
 | Information | Details |
 | :--- | :--- |
-| Current Release | **v0.2.1 — Quality of Life Update** |
-| Release Status | Public Beta |
+| Current Release | **v0.2.4 — HUD Fixes & Rendering Updates** |
+| Launcher Included | **v0.2.2** (in the v0.2.4 portable package) |
+| Release Status | Beta |
 | Platform | Windows 10 / 11 (64-bit) |
 | Renderer | DirectX 11 |
-| CPU Baseline | AVX1, older hardware testing ongoing |
-| Distribution | Existing portable launcher with integrated game updates |
-| Launcher Update | Successfully tested |
-| Game Launch After Update | Successfully tested |
+| CPU Baseline | AVX1 (compatibility hotfix introduced in v0.2.2) |
+| Frame Rate Options | 30, 60, 120, 144, 180, 240 FPS and Uncapped |
+| Distribution | Current portable package for new players; integrated game updates for existing players |
 | Development | Active |
 
 <p align="center">
-  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.0-beta">
-    <img src="https://img.shields.io/badge/Download-Portable%20Launcher-2878c7?style=for-the-badge&logo=github" alt="Download Portable Launcher">
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.4">
+    <img src="https://img.shields.io/badge/Download-v0.2.4%20Portable-2878c7?style=for-the-badge&logo=github" alt="Download v0.2.4 Portable Package">
   </a>
-  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.1">
-    <img src="https://img.shields.io/badge/v0.2.1-Release%20Notes-555555?style=for-the-badge&logo=github" alt="View v0.2.1 Release Notes">
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.4">
+    <img src="https://img.shields.io/badge/v0.2.4-Release%20Notes-555555?style=for-the-badge&logo=github" alt="View v0.2.4 Release Notes">
   </a>
 </p>
 
 > [!TIP]
-> **Already using v0.2.0?**
+> **Already playing LCS Recomp?**
 >
-> You do not need to download or reinstall the launcher.
+> You do not need to download or reinstall the launcher for a compatible game update.
 >
-> Open your existing LCS Recomp Launcher and use its integrated update system to install v0.2.1.
->
-> The update installation and subsequent game launch have been successfully tested.
+> Open your existing LCS Recomp Launcher and use its integrated updater to get v0.2.4. Game updates are designed to preserve your ISO, savegames and settings.
 
 > [!NOTE]
-> New players should download the portable launcher from the v0.2.0 beta release first.
+> **Installing for the first time?** Download `LCS-Recomp-Beta-0.2.4-portable.zip` from the latest release, extract it into a writable folder and follow `START-HERE.txt`.
 >
-> The v0.2.1 release contains the game update package used by the launcher, not a replacement standalone launcher.
+> The package includes Launcher v0.2.2 and the game's source kit. You will need your own supported US PS2 ISO (SLUS-21423).
+>
+> Game updates and launcher upgrades are separate. A launcher upgrade may occasionally be required for future compatibility.
 
 **Recommended gameplay configuration:** 60 FPS with a controller using the Classic control scheme.
 
-Higher frame rates remain experimental.
+Frame rates above 180 FPS remain experimental, and further high-FPS gameplay corrections are still in development.
 
-[Read the complete v0.2.1 changelog](https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.1)
+[Read the complete v0.2.4 changelog](https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.4)
 
 ---
 
 ## What's New
 
-### v0.2.1 at a Glance
+### v0.2.4 at a Glance
+
+| Category | Improvements |
+| :--- | :--- |
+| **Radar & Mission Markers** | Corrected alignment and moving objective markers in the Screen Edges layout |
+| **Subtitles** | Fixed spacing in long subtitles and centred driving dialogue in widescreen |
+| **Widescreen** | Corrected the original PS2 widescreen flag when loading saves |
+| **Frame Rate Options** | Added 144, 180 and 240 FPS modes; fixed modes also set the PC presentation target |
+| **Rendering Pipeline** | Eligible VIF image data now goes directly to the GS queue without an intermediate CPU copy |
+| **Performance Diagnostics** | Improved Windows profiler symbol lookup and separate Render Worker, GS-stage and copy statistics |
+
+### Previously Added in v0.2.1 — Quality of Life Update
 
 The Quality of Life Update focuses on improving the actual gameplay experience while also introducing important technical changes to the PC runtime.
 
@@ -122,7 +133,7 @@ The Quality of Life Update focuses on improving the actual gameplay experience w
 | :--- | :--- |
 | **Rendering Architecture** | Optimized native world render path and persistent GPU vertex buffers |
 | **Rendering Pipeline** | Reduced GS processing overhead and optimized draw submission |
-| **CPU Compatibility** | AVX1 replaces AVX2 as the standard game build target |
+| **CPU Compatibility** | AVX1 compatibility completed with the v0.2.2 hotfix |
 | **Controller Support** | Improved Xbox and PlayStation compatibility |
 | **Input Switching** | Seamless controller and keyboard/mouse switching during gameplay |
 | **DualShock 3** | Native pressure-sensitive acceleration, braking and steering |
@@ -131,7 +142,7 @@ The Quality of Life Update focuses on improving the actual gameplay experience w
 | **Mouse Controls** | Corrected mouse inversion and improved camera behavior |
 | **HUD & Widescreen** | Corrected radar alignment, sniper scope positioning and wanted star timing |
 | **High-FPS Gameplay** | Numerous physics, animation and particle timing corrections |
-| **Launcher Updates** | Successfully tested v0.2.1 installation through the existing launcher |
+| **Game Updates** | Successfully tested v0.2.1 game installation through the existing launcher |
 
 ### Controls & Input Improvements
 
@@ -223,6 +234,17 @@ The Screen Edges HUD layout is now the default for 16:9 gameplay, while 4:3 reta
 
 ## Rendering and Performance
 
+### v0.2.4 Rendering & Profiling Update
+
+- Eligible VIF image data can now be submitted directly to the GS queue, removing an intermediate CPU memory copy.
+- This shortens the affected submission path and reduces unnecessary CPU-side memory traffic.
+- Windows profiling now has improved symbol lookup and separate Render Worker, GS-stage and memory-copy statistics.
+- These changes may help CPU-limited workloads, but measurable FPS or frame-time gains depend on the scene and hardware and have not been established across all configurations.
+
+Performance optimization remains a priority, including gradually replacing more PS2-oriented processing with native PC implementations and moving suitable graphics workloads more directly to the GPU. This is ongoing work, not a feature completed by v0.2.4.
+
+### Earlier Native Rendering Improvements (v0.2.1)
+
 Version 0.2.1 introduces substantial changes to the native rendering pipeline.
 
 The objective is to reduce unnecessary CPU processing, improve rendering efficiency and establish a stronger foundation for future optimizations.
@@ -272,11 +294,11 @@ The Render Worker, Graphics Synthesizer and Emotion Engine can still place signi
 
 ### AVX1 CPU Compatibility
 
-**The Windows game build now targets AVX1 instead of requiring AVX2 as its standard instruction set.**
+**The Windows game build now targets AVX1; the v0.2.2 hotfix corrected the remaining AVX2 build requirement that could cause `0xC000001D` crashes on AVX1-only processors.**
 
 This change is intended to improve compatibility with older processors that support AVX but not AVX2.
 
-- Updated the Windows build target to AVX1.
+- Updated the Windows build target to AVX1 (effective with the v0.2.2 compatibility fix).
 - Reduced reliance on AVX2 as the baseline requirement.
 - Successfully compiled AVX1 development builds.
 - Completed build integrity verification.
@@ -294,7 +316,7 @@ The vehicle reflection setting defaults to **As on PS2**, preserving the origina
 
 Experimental adjustments that produced undesirable results were reverted.
 
-[Read the full technical changes](https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.1)
+[Read the v0.2.4 rendering and profiling updates](https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.4)
 
 ---
 
@@ -386,7 +408,10 @@ Some options remain experimental or require further refinement.
 
 - 30 FPS
 - 60 FPS
-- Experimental 120 FPS
+- 120 FPS
+- 144 FPS
+- 180 FPS
+- Experimental 240 FPS
 - Experimental uncapped FPS
 - Improved frame pacing
 - Expanded 64 MB game memory
@@ -480,10 +505,10 @@ These represent the development vision rather than two fully completed and indep
 
 ### First-Time Installation
 
-**New players should begin with the portable launcher from v0.2.0.**
+**New players only need to download the launcher for their first installation.** The latest portable package already includes Launcher v0.2.2 and the v0.2.4 game source kit.
 
-1. Download the launcher from the [v0.2.0 Public Beta release](https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.0-beta).
-2. Extract the portable archive to a writable directory.
+1. Download `LCS-Recomp-Beta-0.2.4-portable.zip` from the [latest release](https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.2.4).
+2. Extract the portable archive to a writable directory and follow `START-HERE.txt`.
 3. Start **LCS Recomp Launcher**.
 4. Open the **Installation** section.
 5. Select your original PlayStation 2 game ISO.
@@ -491,7 +516,7 @@ These represent the development vision rather than two fully completed and indep
 7. Optionally select your preferred game installation directory.
 8. Click **Prepare game**.
 9. Allow the launcher to download the required tools and prepare the native PC executable.
-10. Once preparation is complete, install any available game updates through the launcher.
+10. If any compatible game update is offered, install it through the launcher.
 11. Open **Home** and click **Play**.
 
 No manual compilation or programming knowledge is required.
@@ -500,36 +525,36 @@ The original game ISO remains on your PC.
 
 No original game files are uploaded.
 
-### Updating from v0.2.0 to v0.2.1
+### Updating an Existing Installation
 
 > [!TIP]
 > **Already have LCS Recomp installed?**
 >
-> You do not need to download or reinstall the launcher.
+> You do not need to download or reinstall the launcher to receive compatible game updates.
 
 1. Open your existing LCS Recomp Launcher.
-2. Check for the available v0.2.1 update.
+2. Check for the available v0.2.4 game update.
 3. Start the update.
 4. Allow the launcher to download and verify the update package.
 5. Wait for game preparation to finish.
 6. Launch the game normally.
 
-### Update Verification
+### Previous Update Verification (v0.2.1)
 
-The v0.2.1 update workflow has been successfully tested.
+The v0.2.1 game update workflow was successfully tested. This table documents those earlier tests, not a new v0.2.4 verification run.
 
 | Test | Result |
 | :--- | :--- |
 | Update Package Preparation | Passed |
 | Ed25519 Signature Verification | Passed |
 | Package Integrity Verification | Passed |
-| Launcher Update Installation | Passed |
+| Game Update Installation via Launcher | Passed |
 | Game Launch After Update | Passed |
 | Basic Gameplay After Update | Passed |
 
-The update was successfully installed, and the game launched and ran correctly afterward.
+The v0.2.1 game update was successfully installed, and the game launched and ran correctly afterward.
 
-The launcher is designed to preserve existing savegames, configuration, game installation preferences and the original ISO.
+The launcher is designed to preserve existing savegames, configuration, game installation preferences and the original ISO. Launcher upgrades are separate from game updates and may occasionally be needed for compatibility.
 
 Backing up savegames before updating is still recommended while the project remains in beta.
 
@@ -608,7 +633,7 @@ Only download LCS Recomp from the official GitHub repository and verify the sour
 
 LCS Recomp is still under active development.
 
-The following issues have not been fully resolved in v0.2.1.
+The following issues have not been fully resolved in v0.2.4.
 
 | Issue | Current Status |
 | :--- | :--- |
@@ -701,7 +726,7 @@ The roadmap reflects the current development direction.
 
 Priorities may change depending on technical feasibility, available development time and community feedback.
 
-Features listed below are planned for future releases and are not included in v0.2.1 unless explicitly stated otherwise.
+Features listed below are planned for future releases and are not included in v0.2.4 unless explicitly stated otherwise.
 
 ### In-Game Trainer & Function Key Overhaul
 
@@ -737,7 +762,7 @@ The goal is to separate gameplay settings, graphics configuration, performance m
 
 The existing F1 Maverick helicopter spawn functionality is planned to move into the trainer's vehicle section.
 
-The current v0.2.1 function key assignments remain unchanged.
+The current v0.2.4 function key assignments remain unchanged.
 
 </details>
 
@@ -758,7 +783,7 @@ The planned in-game trainer will provide convenient access to gameplay and testi
 
 The exact interface and feature set are still being designed.
 
-**The trainer is not included in v0.2.1.**
+**The trainer is not included in v0.2.4.**
 
 </details>
 
@@ -799,13 +824,13 @@ The exact interface and feature set are still being designed.
 
 The launcher is being reworked as a dedicated component of the project.
 
-A portable-first approach is planned for future versions.
+Portable ZIP releases are already available; further launcher improvements are planned.
 
 Planned improvements include:
 
 - Redesigned launcher interface.
 - Improved visual presentation and animations.
-- Portable ZIP distribution.
+- Continued improvements to portable ZIP distribution.
 - More reliable game preparation.
 - Improved dependency management.
 - Better download and preparation progress.
@@ -813,7 +838,7 @@ Planned improvements include:
 - Improved update and recovery functionality.
 - Better separation between the launcher and game runtime.
 
-The current launcher already supports the v0.2.1 update workflow.
+The current launcher supports game updates through v0.2.4.
 
 The larger redesign is a future development effort.
 
