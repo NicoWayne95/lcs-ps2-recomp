@@ -295,16 +295,21 @@ The Render Worker, Graphics Synthesizer and Emotion Engine can still place signi
 >
 > They do not guarantee higher FPS in every scene or on every hardware configuration.
 
-### AVX1 CPU Compatibility
 
-**The Windows game build now targets AVX1; the v0.2.2 hotfix corrected the remaining AVX2 build requirement that could cause `0xC000001D` crashes on AVX1-only processors.**
+### Automatic CPU Detection & AVX Compatibility
 
-This change is intended to improve compatibility with older processors that support AVX but not AVX2.
+**LCS Recomp now automatically detects the host CPU's supported instruction sets and selects the appropriate build configuration during game preparation.**
 
-- Updated the Windows build target to AVX1 (effective with the v0.2.2 compatibility fix).
-- Reduced reliance on AVX2 as the baseline requirement.
-- Successfully compiled AVX1 development builds.
-- Completed build integrity verification.
+Instead of using a fixed AVX1 or AVX2 requirement, the build process checks the processor's capabilities and dynamically selects the corresponding optimization target.
+
+- Automatic CPU feature detection during game preparation.
+- AVX2-optimized builds for compatible processors.
+- AVX builds for older processors without AVX2 support.
+- No manual CPU configuration required.
+- Improved compatibility across different CPU generations.
+- Prevents AVX2-only instructions from being used on unsupported CPUs.
+
+This replaces the previous fixed AVX configuration introduced in v0.2.2, allowing LCS Recomp to take advantage of newer processors while maintaining compatibility with older AVX-capable hardware.
 
 
 ### Vehicle Reflections
