@@ -135,7 +135,6 @@ The update also introduces **PCSX2-compatible HD texture packs, SMAA anti-aliasi
 | **HDR** | Native HDR output with configurable brightness and highlight controls |
 | **Display Configuration** | Automatic resolution and refresh-rate detection |
 | **Interface** | Adjustable text size and improved HUD rendering |
-| **Controllers** | Native vibration and original DualShock 2/3 button prompts |
 | **Gameplay Timing** | Improved high-FPS simulation and animation consistency |
 | **Savegames** | Improved backup reliability and consolidated save directories |
 
