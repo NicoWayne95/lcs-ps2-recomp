@@ -335,8 +335,8 @@ The following features are available in the current public beta. Some remain exp
 | :--- | :--- |
 | DirectX 11 rendering | Playable open-world gameplay |
 | Original PS2 rendering resolution | Playable missions and original cutscenes |
-| 1080p, 1440p, and 4K options | 30, 60, 120, 144, 180, and 240 FPS modes |
-| Widescreen support | Uncapped mode with a default 240 FPS safety limit |
+| 1080p, 1440p, and 4K options | 30, 60, 120, 144 and 180 FPS |
+| Widescreen support | Uncapped mode with a default 180 FPS safety limit |
 | MSAA up to 8× | Improved high-FPS gameplay timing |
 | SMAA, SMAA 2X, SMAA 4X | Optimized native rendering paths |
 | Anisotropic filtering up to 16× | Improved frame pacing |
@@ -349,9 +349,9 @@ The following features are available in the current public beta. Some remain exp
 | Xbox controller support | PCSX2-compatible HD texture packs |
 | PlayStation controller support | Adjustable text scaling |
 | DualShock 3 pressure-sensitive controls | Additional graphics configuration |
-| Original DualShock 2/3 button prompts | Automatic monitor detection |
+| Original DualShock 2/3 button prompts, when using a HD HUD Texture-Pack | Automatic monitor detection |
 | Adaptive controller prompts | Unified `lcs.ini` configuration |
-| Native controller vibration | Local performance diagnostics |
+| Controller vibration | Local performance diagnostics |
 | Seamless input-device switching | Free Camera mode |
 | Native keyboard and mouse input | Toggleable HUD |
 | Free mouse-controlled vehicle camera | Mouse-wheel weapon switching |
