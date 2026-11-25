@@ -94,7 +94,7 @@ Major parts of the rendering pipeline, frame presentation, CPU scheduling, resou
 
 In internal testing, demanding scenes with heavy traffic and pedestrians improved from approximately **130 FPS to 210–225 FPS**, representing a performance increase of roughly **60–70%** in that particular workload.
 
-The update also introduces **PCSX2-compatible HD texture packs, SMAA anti-aliasing, native HDR output, adjustable text size, controller vibration**, and numerous rendering and gameplay improvements.
+The update also introduces **PCSX2-compatible HD texture packs, SMAA anti-aliasing, HDR output, adjustable text size, controller vibration**, and numerous rendering and gameplay improvements.
 
 <p align="center">
   <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/download/v0.3.0/LCS-Recomp-Beta-0.3.0-portable.zip">
@@ -132,7 +132,7 @@ The update also introduces **PCSX2-compatible HD texture packs, SMAA anti-aliasi
 | **World Streaming** | Persistent level decompression cache and asynchronous texture processing |
 | **HD Texture Packs** | Native support for compatible PCSX2 replacement texture packs |
 | **Anti-Aliasing** | SMAA, SMAA 2X, and SMAA 4X |
-| **HDR** | Native HDR output with configurable brightness and highlight controls |
+| **HDR** | HDR output with configurable brightness and highlight controls |
 | **Display Configuration** | Automatic resolution and refresh-rate detection |
 | **Interface** | Adjustable text size and improved HUD rendering |
 | **Gameplay Timing** | Improved high-FPS simulation and animation consistency |
@@ -182,7 +182,7 @@ These options provide a less expensive alternative to demanding MSAA settings, p
 
 ### HDR Output — Stage 1
 
-LCS Recomp supports native HDR output on compatible displays when HDR is enabled in Windows.
+LCS Recomp supports HDR output on compatible displays when HDR is enabled in Windows.
 
 The HDR settings provide controls for:
 
