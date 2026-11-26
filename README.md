@@ -83,25 +83,30 @@ Experience Liberty City with higher rendering resolutions, improved performance,
 
 ## <a id="project-status"></a>Project Status
 
+
+<div align="center">
+
 <table>
   <tr>
-    <td align="center" width="33%">
+    <td align="center" valign="top" width="240">
       <strong>Latest Public Release</strong>
       <br><br>
       <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">
-        <img src="https://img.shields.io/github/v/release/NicoWayne95/lcs-ps2-recomp?style=for-the-badge&label=Version&color=2ea44f" alt="Latest Public Release">
+        <img src="https://img.shields.io/github/v/release/NicoWayne95/lcs-ps2-recomp?style=for-the-badge&label=Version&color=2ea44f" alt="Latest Release">
       </a>
       <br><br>
       Available for download
     </td>
-    <td align="center" width="33%">
+    <td align="center" valign="top" width="240">
       <strong>Current Development</strong>
       <br><br>
-      <img src="https://img.shields.io/badge/Version-v0.3.1-2878c7?style=for-the-badge" alt="Development Version">
+      <a href="docs/updates/v0.3.1/README.md">
+        <img src="https://img.shields.io/badge/Version-v0.3.1-2878c7?style=for-the-badge" alt="Development Preview">
+      </a>
       <br><br>
       Internal development build
     </td>
-    <td align="center" width="33%">
+    <td align="center" valign="top" width="240">
       <strong>Project Activity</strong>
       <br><br>
       <img src="https://img.shields.io/badge/Development-Active-2ea44f?style=for-the-badge" alt="Active Development">
@@ -110,6 +115,9 @@ Experience Liberty City with higher rendering resolutions, improved performance,
     </td>
   </tr>
 </table>
+
+</div>
+
 
 ### Current Development Focus
 
