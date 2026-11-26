@@ -2,157 +2,307 @@
 <h1 align="center">LCS Recomp</h1>
 
 <p align="center">
-  <img src="LCS_recomp2.png" alt="LCS Recomp — Unofficial Concept Artwork" width="430">
+  <img src="LCS_recomp2.png" alt="LCS Recomp — Unofficial Concept Artwork" width="320">
 </p>
 
 <h3 align="center">Liberty City Stories. Recompiled for PC.</h3>
 
 <p align="center">
-  An unofficial native PC recompilation of the PlayStation 2 version of<br>
-  <strong>Grand Theft Auto: Liberty City Stories</strong>.
+  An unofficial native PC recompilation of<br>
+  <strong>Grand Theft Auto: Liberty City Stories</strong><br>
+  based on the original PlayStation 2 release.
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Windows%20x64-0078D4?style=flat-square" alt="Windows x64">
   <img src="https://img.shields.io/badge/Renderer-DirectX%2011-0078D4?style=flat-square" alt="DirectX 11">
   <img src="https://img.shields.io/badge/Status-Public%20Beta-E97132?style=flat-square" alt="Public Beta">
-  <img src="https://img.shields.io/github/v/release/NicoWayne95/lcs-ps2-recomp?style=flat-square" alt="Latest Release">
-  <img src="https://img.shields.io/github/downloads/NicoWayne95/lcs-ps2-recomp/total?style=flat-square" alt="Downloads">
-  <img src="https://img.shields.io/github/stars/NicoWayne95/lcs-ps2-recomp?style=flat-square" alt="GitHub Stars">
+  <img src="https://img.shields.io/badge/Development-Active-2ea44f?style=flat-square" alt="Active Development">
 </p>
 
 <p align="center">
-  <a href="#latest-release"><strong>Download</strong></a> ·
-  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">Release Notes</a> ·
-  <a href="#whats-new">What's New</a> ·
-  <a href="#performance">Performance</a> ·
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">
+    <img src="https://img.shields.io/github/v/release/NicoWayne95/lcs-ps2-recomp?style=flat-square&label=Latest%20Release" alt="Latest Release">
+  </a>
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/commits/main/">
+    <img src="https://img.shields.io/github/last-commit/NicoWayne95/lcs-ps2-recomp/main?style=flat-square&label=Last%20Commit" alt="Last Commit">
+  </a>
+  <img src="https://img.shields.io/github/downloads/NicoWayne95/lcs-ps2-recomp/total?style=flat-square&label=Downloads" alt="Downloads">
+  <img src="https://img.shields.io/github/stars/NicoWayne95/lcs-ps2-recomp?style=flat-square&label=Stars" alt="Stars">
+  <img src="https://img.shields.io/github/issues/NicoWayne95/lcs-ps2-recomp?style=flat-square&label=Open%20Issues" alt="Open Issues">
+</p>
+
+<p align="center">
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">
+    <img src="https://img.shields.io/badge/Download-Latest%20Release-238636?style=for-the-badge&logo=github" alt="Download Latest Release">
+  </a>
+  <a href="#installation">
+    <img src="https://img.shields.io/badge/Getting%20Started-Installation-2878c7?style=for-the-badge" alt="Installation Guide">
+  </a>
+</p>
+
+<p align="center">
+  <a href="#project-status">Project Status</a> ·
+  <a href="#latest-release">Latest Release</a> ·
+  <a href="#development">Development</a> ·
   <a href="#features">Features</a> ·
-  <a href="#installation">Installation</a>
+  <a href="#performance">Performance</a>
 </p>
 
 <p align="center">
-  <a href="#known-issues">Known Issues</a> ·
-  <a href="#roadmap">Roadmap</a> ·
   <a href="#screenshots">Screenshots</a> ·
-  <a href="#source-code">Source Code</a> ·
-  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/discussions">Discussions</a> ·
-  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/issues">Report a Bug</a>
+  <a href="#roadmap">Roadmap</a> ·
+  <a href="#documentation">Documentation</a> ·
+  <a href="#community">Community</a> ·
+  <a href="#credits">Credits</a>
 </p>
 
 ---
 
 ## Welcome back to Liberty City!
 
-**LCS Recomp** is an independent fan project bringing the PlayStation 2 version of Grand Theft Auto: Liberty City Stories to PC through static recompilation and a custom native runtime.
+**LCS Recomp** brings the PlayStation 2 version of Grand Theft Auto: Liberty City Stories to PC through static recompilation and a custom native runtime.
 
-The goal is to preserve the atmosphere, gameplay, and visual identity of the original game while introducing optional improvements designed for modern PC hardware.
+The project aims to preserve the original game's atmosphere, gameplay and visual identity while introducing optional enhancements for modern PC hardware.
 
-Players can enjoy the classic PlayStation 2 experience or take advantage of higher resolutions, improved frame rates, modern controls, additional graphics options, and native PC enhancements.
-
-Unlike traditional emulation, LCS Recomp uses a locally prepared executable and a custom runtime that combines recompiled PS2 game code with increasingly optimized native PC implementations.
+Experience Liberty City with higher rendering resolutions, improved performance, modern input options, configurable graphics settings and optional HD texture replacements.
 
 > [!IMPORTANT]
-> **LCS Recomp is a solo-developed project.**
+> LCS Recomp is an independent, solo-developed fan project maintained in my spare time.
 >
-> I'm developing and maintaining this project entirely on my own in my spare time, covering reverse engineering, runtime development, debugging, optimization, testing, and releases.
->
-> This is my first recompilation project of this kind, and I'm continuously learning along the way. The project builds upon existing open-source work and uses AI-assisted development tools, but development decisions, integration, testing, and release management remain my responsibility.
->
-> As this is a personal hobby project, development progress depends on the time I have available.
+> Development includes reverse engineering, runtime improvements, optimization, debugging, testing and release management.
 
 > [!WARNING]
-> **LCS Recomp is currently in Public Beta.**
+> LCS Recomp is currently in **Public Beta**.
 >
-> Although the game is playable, bugs, crashes, performance limitations, graphical issues, and incomplete features may still occur. Not every mission, hardware configuration, or gameplay feature has been fully validated.
-
-**To play LCS Recomp, you need your own supported PlayStation 2 game ISO.** The launcher prepares the game locally. No original copyrighted game assets or ISO files are included with the project.
+> Bugs, crashes, compatibility issues and incomplete features may still occur.
+>
+> You must provide your own supported PlayStation 2 game ISO. Original game files are not included.
 
 ---
 
-## <a id="latest-release"></a>Latest Release
+## <a id="project-status"></a>Project Status
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <strong>Latest Public Release</strong>
+      <br><br>
+      <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">
+        <img src="https://img.shields.io/github/v/release/NicoWayne95/lcs-ps2-recomp?style=for-the-badge&label=Version&color=2ea44f" alt="Latest Public Release">
+      </a>
+      <br><br>
+      Available for download
+    </td>
+    <td align="center" width="33%">
+      <strong>Current Development</strong>
+      <br><br>
+      <img src="https://img.shields.io/badge/Version-v0.3.1-2878c7?style=for-the-badge" alt="Development Version">
+      <br><br>
+      Internal development build
+    </td>
+    <td align="center" width="33%">
+      <strong>Project Activity</strong>
+      <br><br>
+      <img src="https://img.shields.io/badge/Development-Active-2ea44f?style=for-the-badge" alt="Active Development">
+      <br><br>
+      Continuous improvements
+    </td>
+  </tr>
+</table>
+
+### Current Development Focus
+
+| Development Area | Priority | Status |
+| :--- | :---: | :--- |
+| Performance optimization | High | Ongoing |
+| Stability and compatibility | High | Ongoing |
+| Memory management | High | Planned |
+| Mouse aiming accuracy | High | Investigating |
+| PC menu improvements | High | Development build |
+| Launcher redesign | Medium | Planned |
+| Extended world draw distance | Medium | Planned |
+| Native HDR rendering | Long-term | Planned |
 
 <p align="center">
-  <img src="docs/features/v0.3.0.png" alt="LCS Recomp v0.3.0 — Performance & Quality of Life Update" width="100%">
+  <a href="#development"><strong>Development Activity</strong></a> ·
+  <a href="#roadmap"><strong>Project Roadmap</strong></a> ·
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/issues"><strong>Issue Tracker</strong></a>
+</p>
+
+---
+
+## <a id="latest-release"></a>Latest Public Release
+
+<p align="center">
+  <img src="docs/features/v0.3.0.png" width="100%" alt="LCS Recomp v0.3.0 — Performance & Quality of Life Update">
 </p>
 
 <h3 align="center">v0.3.0 — Performance & Quality of Life Update</h3>
 
 <p align="center">
-  Faster rendering, significantly improved frame pacing, reduced stuttering,
-  HD texture packs, and additional PC-focused features.
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Version-v0.3.0-2ea44f?style=flat-square" alt="Version 0.3.0">
   <img src="https://img.shields.io/badge/Released-November%2024%2C%202026-555555?style=flat-square" alt="Release Date">
-  <img src="https://img.shields.io/badge/Status-Public%20Beta-E97132?style=flat-square" alt="Public Beta">
+  <img src="https://img.shields.io/badge/Status-Available-2ea44f?style=flat-square" alt="Available">
 </p>
 
-Version **0.3.0** introduces one of the largest technical updates to LCS Recomp so far.
+One of the largest technical updates to LCS Recomp so far, introducing substantial improvements to rendering performance, frame pacing, resource management and PC-focused features.
 
-Major parts of the rendering pipeline, frame presentation, CPU scheduling, resource management, and world streaming have been optimized to reduce unnecessary processing overhead and improve performance consistency.
-
-In internal testing, demanding scenes with heavy traffic and pedestrians improved from approximately **130 FPS to 210–225 FPS**, representing a performance increase of roughly **60–70%** in that particular workload.
-
-The update also introduces **PCSX2-compatible HD texture packs, SMAA anti-aliasing, HDR output, adjustable text size, controller vibration**, and numerous rendering and gameplay improvements.
+| Performance & Rendering | Features & Quality of Life |
+| :--- | :--- |
+| Reduced CPU rendering overhead | PCSX2-compatible HD texture packs |
+| Optimized native rendering paths | SMAA anti-aliasing |
+| Improved frame pacing | Configurable HDR output |
+| Faster resource processing | Adjustable text size |
+| Improved world streaming | Controller vibration |
+| Reduced unnecessary GPU work | Automatic monitor detection |
 
 <p align="center">
-  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/download/v0.3.0/LCS-Recomp-Beta-0.3.0-portable.zip">
-    <img src="https://img.shields.io/badge/Download-v0.3.0%20Portable-2878c7?style=for-the-badge&logo=github" alt="Download LCS Recomp v0.3.0">
-  </a>
   <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.3.0">
-    <img src="https://img.shields.io/badge/View-Release%20Notes-555555?style=for-the-badge&logo=github" alt="View v0.3.0 Release Notes">
+    <img src="https://img.shields.io/badge/View-Full%20Release%20Notes-2878c7?style=for-the-badge&logo=github" alt="Full Release Notes">
+  </a>
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">
+    <img src="https://img.shields.io/badge/Download-Latest%20Release-238636?style=for-the-badge&logo=github" alt="Download Latest Release">
   </a>
 </p>
 
 > [!TIP]
-> **Already playing LCS Recomp?**
+> Already have LCS Recomp installed?
 >
-> Open your existing launcher and install the latest compatible game update through the integrated updater. You normally do not need to reinstall the launcher.
->
-> Game updates are designed to preserve your original ISO, savegames, and configuration. Launcher upgrades may occasionally be required for compatibility.
+> Open your existing launcher and check for the latest compatible game update. Reinstalling the launcher is normally not required.
 
-> [!NOTE]
-> **New players:** Download the v0.3.0 portable package, extract it into a writable folder, and follow the included `START-HERE.txt`.
->
-> You will need your own supported **USA / NTSC-U PS2 ISO (SLUS-21423)**.
+<p align="center">
+  <a href="docs/updates/README.md">Browse Previous Updates</a>
+</p>
 
 ---
 
-## <a id="whats-new"></a>What's New in v0.3.0?
+## <a id="development"></a>Development Activity
 
-### Major Improvements at a Glance
+<p>
+  <img src="https://img.shields.io/badge/Current%20Development-v0.3.1-2878c7?style=flat-square" alt="Current Development">
+  <img src="https://img.shields.io/badge/Status-In%20Development-E97132?style=flat-square" alt="In Development">
+</p>
 
-| Category | Improvements |
+Development continues between public releases.
+
+The next update focuses on further refining the PC experience, improving existing systems and addressing community-reported issues.
+
+### Recent Development Highlights
+
+| Development | Description | Status |
+| :--- | :--- | :--- |
+| Expanded PC menus | Reorganized controls and display configuration | Implemented in development build |
+| Screen settings | Monitor selection, resolution scaling and frame synchronization | Development build |
+| Graphics settings | Dedicated rendering configuration | Development build |
+| HDR settings | Dedicated HDR configuration menu | Development build |
+| Interface settings | HUD layout, visibility and text scaling | Development build |
+| Extras menu | Additional optional enhancements | Development build |
+| Beta police cars | Optional blue and white LCPD appearance | Visually implemented |
+| Frame-rate limit | Maximum gameplay frame rate of 180 FPS | Development build |
+| Mouse aiming | Investigation of crosshair and projectile inconsistencies | Investigating |
+| Memory management | Further resource and memory optimization | Planned |
+| Launcher | New architecture and faster preparation workflow | Planned |
+
+> [!NOTE]
+> Development features may not yet be included in the latest public release. Implementation, testing and release readiness are separate development stages.
+
+### Development Resources
+
+| Resource | Description |
 | :--- | :--- |
-| **Performance** | Up to approximately 60–70% higher FPS in the tested traffic-heavy scenario |
-| **Native Rendering** | Optimized vehicle rendering, shared meshes, faster skinning, and reduced GS processing |
-| **Frame Pacing** | Reworked presentation pipeline to reduce wasted GPU work and improve high-refresh-rate smoothness |
-| **CPU Efficiency** | Faster scheduler, optimized memory handling, reduced allocations, and reusable command buffers |
-| **World Streaming** | Persistent level decompression cache and asynchronous texture processing |
-| **HD Texture Packs** | Native support for compatible PCSX2 replacement texture packs |
-| **Anti-Aliasing** | SMAA, SMAA 2X, and SMAA 4X |
-| **HDR** | HDR output with configurable brightness and highlight controls |
-| **Display Configuration** | Automatic resolution and refresh-rate detection |
-| **Interface** | Adjustable text size and improved HUD rendering |
-| **Gameplay Timing** | Improved high-FPS simulation and animation consistency |
-| **Savegames** | Improved backup reliability and consolidated save directories |
+| [v0.3.1 Development Showcase](docs/updates/v0.3.1/README.md) | Upcoming changes and development screenshots |
+| [Update History](docs/updates/README.md) | Previous updates and development milestones |
+| [Repository Activity](https://github.com/NicoWayne95/lcs-ps2-recomp/commits/main/) | Recent public repository commits |
+| [Open Issues](https://github.com/NicoWayne95/lcs-ps2-recomp/issues) | Bug reports and feature requests |
+| [Discussions](https://github.com/NicoWayne95/lcs-ps2-recomp/discussions) | Community feedback and development discussions |
 
-### HD Texture Pack Support
+---
 
-LCS Recomp now supports compatible **PCSX2 texture replacement packs** without requiring manual filename changes or texture conversion.
+## <a id="features"></a>Key Features
+
+<table>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Graphics & Display</h3>
+      <ul>
+        <li>DirectX 11 rendering</li>
+        <li>Internal resolution scaling</li>
+        <li>Widescreen support</li>
+        <li>SMAA, SMAA 2X and SMAA 4X</li>
+        <li>16× anisotropic filtering</li>
+        <li>Configurable vehicle reflections</li>
+        <li>Original trails and glow effects</li>
+        <li>Configurable HDR output</li>
+      </ul>
+    </td>
+    <td width="50%" valign="top">
+      <h3>Performance & Gameplay</h3>
+      <ul>
+        <li>Playable open-world gameplay</li>
+        <li>Original missions and cutscenes</li>
+        <li>High-refresh-rate gameplay</li>
+        <li>Optimized native rendering paths</li>
+        <li>Improved frame pacing</li>
+        <li>Improved world streaming</li>
+        <li>Resource management improvements</li>
+        <li>Local savegames and backups</li>
+      </ul>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Controls & Input</h3>
+      <ul>
+        <li>Xbox controller support</li>
+        <li>PlayStation controller support</li>
+        <li>Native keyboard and mouse input</li>
+        <li>Adjustable controller vibration</li>
+        <li>Adaptive button prompts</li>
+        <li>Mouse-wheel weapon switching</li>
+        <li>Mouse-controlled camera</li>
+        <li>Classic controller configurations</li>
+      </ul>
+    </td>
+    <td width="50%" valign="top">
+      <h3>PC Enhancements</h3>
+      <ul>
+        <li>Compatible PCSX2 texture packs</li>
+        <li>Adjustable text size</li>
+        <li>Toggleable HUD</li>
+        <li>Automatic monitor detection</li>
+        <li>Free Camera mode</li>
+        <li>Native audio and video playback</li>
+        <li>Persistent configuration</li>
+        <li>Performance diagnostics</li>
+      </ul>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <a href="docs/FEATURES.md">
+    <img src="https://img.shields.io/badge/Explore-PC%20Features%20%26%20Settings-2878c7?style=for-the-badge" alt="Explore PC Features">
+  </a>
+</p>
+
+<details>
+<summary><strong>HD Texture Pack Support</strong></summary>
+
+<br>
+
+LCS Recomp supports compatible PCSX2 texture replacement packs for supported textures.
 
 Features include:
 
 - Automatic recognition of supported replacement textures.
 - Support for 4-bit and 8-bit palettized textures.
-- HD replacements for HUD elements, icons, radar, maps, fonts, and loading screens.
-- Background texture loading to reduce gameplay interruptions.
-- Original textures remain visible until their replacements are ready.
+- HD HUD elements, icons, radar, maps and fonts.
+- Background texture loading.
+- Original textures remain visible until replacements are ready.
 
-**Installation:**
+### Installation
 
-Place the texture pack's `SLUS-21423` folder inside `textures/` next to `LCSrecomp.exe`.
+Place the texture pack's `SLUS-21423` folder inside the `textures` directory next to `LCSrecomp.exe`.
 
 ```text
 LCS Recomp/
@@ -163,101 +313,152 @@ LCS Recomp/
             └── ...
 ```
 
-> [!NOTE]
-> HD texture packs are not included. Only use replacement textures you are authorized to use.
->
-> Region-suffixed replacements and custom mipmap levels are not yet supported.
+HD texture packs are optional and are not distributed with LCS Recomp.
 
-### SMAA Anti-Aliasing
+Compatibility with individual texture packs may vary.
 
-Three additional anti-aliasing options are available:
+</details>
 
-- SMAA
-- SMAA 2X
-- SMAA 4X
+<details>
+<summary><strong>HDR Output — Stage 1</strong></summary>
 
-SMAA processes the rendered 3D scene before the HUD is composited, helping maintain sharp text and interface elements.
+<br>
 
-These options provide a less expensive alternative to demanding MSAA settings, particularly at higher resolutions.
+LCS Recomp supports configurable HDR presentation on compatible displays.
 
-### HDR Output — Stage 1
-
-LCS Recomp supports HDR output on compatible displays when HDR is enabled in Windows.
-
-The HDR settings provide controls for:
+Available configuration options include:
 
 - Paper-white brightness.
 - Peak brightness.
 - Highlight intensity.
 - Highlight start.
 - Saturation.
-- Display-reported peak brightness.
 
-HDR activation changes require a game restart. Image adjustments take effect immediately.
+The current HDR implementation enhances the original game's SDR presentation for HDR-compatible displays.
 
-### Adjustable Text Size
+It is not a fully native HDR rendering pipeline.
 
-A new **Text Size** setting is available in the F2 configuration menu.
+Native HDR rendering remains a long-term development goal.
 
-- Adjustable from 75% to 150%.
-- Applies to subtitles, mission messages, help text, area names, vehicle names, and radio stations.
-- Text wrapping, background boxes, and embedded button prompts scale together.
-- The clock, money display, ammunition counter, and pause menu retain their existing sizes.
+Enabling or disabling HDR output requires a game restart.
 
-### Controller & Input Improvements
+</details>
 
-Version 0.3.0 also introduces:
+<details>
+<summary><strong>Controller Compatibility & Original Input Behavior</strong></summary>
 
-- Native controller vibration with adjustable intensity.
-- Individual vibration profiles for supported controllers.
-- Original DualShock 2 and DualShock 3 button glyphs.
-- Improved vibration shutdown behavior.
-- Persistent vibration preferences through `lcs.ini`.
+<br>
 
-### Additional Quality of Life Improvements
+LCS Recomp aims to preserve the original controller experience while introducing additional PC input options.
 
-- Automatic monitor detection during initial configuration.
-- Live vehicle reflection resolution selection.
-- Improved radar clipping.
-- Improved decal and object visibility.
-- More reliable memory-card backups.
-- Improved loading-screen and audio synchronization.
-- More consistent gameplay timing at high frame rates.
+Supported configurations include:
 
-[**Read the complete v0.3.0 changelog**](https://github.com/NicoWayne95/lcs-ps2-recomp/releases/tag/v0.3.0)
+- Compatible Xbox controllers.
+- Compatible PlayStation controllers.
+- Adjustable controller vibration.
+- Adaptive controller button prompts.
+- Native keyboard and mouse input.
+
+Original DualShock-style button glyphs can be displayed through compatible HD HUD texture packs.
+
+Pressure-sensitive DualShock 3 input requires compatible drivers. Actual behavior depends on the controller, driver configuration and game input implementation.
+
+</details>
+
+<details>
+<summary><strong>Native Audio & Video</strong></summary>
+
+<br>
+
+Native audio and video implementations support the original game's:
+
+- Radio stations.
+- Music and sound effects.
+- Ambient audio.
+- Dialogue and mission audio.
+- Cutscene audio.
+- Introductory movie playback.
+
+</details>
 
 ---
 
 ## <a id="performance"></a>Rendering & Performance
 
-### Major Performance Improvements
-
 Performance optimization is one of the main development priorities of LCS Recomp.
 
-Version 0.3.0 substantially reduces CPU-side rendering overhead and improves resource reuse, command submission, and frame delivery.
+The runtime combines recompiled PlayStation 2 game code with increasingly optimized native PC implementations.
 
-### Internal Benchmark Results
+### Performance Highlights
 
-| Test Scenario | Previous | v0.3.0 |
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <strong>Traffic-Heavy Benchmark</strong>
+      <br><br>
+      <h2>+60–70%</h2>
+      Higher measured FPS
+    </td>
+    <td align="center" width="33%">
+      <strong>Frame Time</strong>
+      <br><br>
+      <h2>~4.5–4.8 ms</h2>
+      Compared with ~7.5–7.8 ms
+    </td>
+    <td align="center" width="33%">
+      <strong>Frame Pacing</strong>
+      <br><br>
+      <h2>0.1%</h2>
+      Frames exceeding 10 ms
+    </td>
+  </tr>
+</table>
+
+These results represent historical internal benchmarks collected during v0.3.0 development on an NVIDIA RTX 4090 system.
+
+Actual performance improvements depend on hardware, graphics settings, resolution and scene complexity.
+
+### Optimization Areas
+
+| Area | Improvements |
+| :--- | :--- |
+| Native Rendering | World geometry, vehicles, skinning and GPU resource reuse |
+| CPU Efficiency | Scheduling, allocations and command submission |
+| Frame Presentation | Synchronization and reduced rendering queue depth |
+| GPU Efficiency | Reduced redundant uploads and unnecessary processing |
+| World Streaming | Persistent decompression cache and asynchronous processing |
+| Resource Management | Mesh caching, texture reuse and background cleanup |
+
+<details>
+<summary><strong>View Detailed Internal Benchmark Results</strong></summary>
+
+<br>
+
+| Test Scenario | Previous Build | v0.3.0 Benchmark |
 | :--- | ---: | ---: |
-| Portland Police Station — heavy traffic and pedestrians | ~130 FPS | **~210–225 FPS** |
+| Portland Police Station — heavy traffic | ~130 FPS | **~210–225 FPS** |
 | Frame time in the same scene | ~7.5–7.8 ms | **~4.5–4.8 ms** |
-| Command-chain buffer reuse benchmark | 118 FPS | **145 FPS** |
-| Frames exceeding 10 ms in the same test | 3.3% | **0.1%** |
-| Free camera — ground toward water | 247 FPS | **Up to 330 FPS** |
+| Command-chain buffer reuse | 118 FPS | **145 FPS** |
+| Frames exceeding 10 ms | 3.3% | **0.1%** |
+| Free camera — ground toward water | 247 FPS | **330 FPS** |
 | Free camera — above the city | 154 FPS | **170 FPS** |
-| Free camera — high above toward another island | 224 FPS | **277 FPS** |
+| Free camera — toward another island | 224 FPS | **277 FPS** |
 
 > [!NOTE]
-> These are internal development measurements collected on an NVIDIA RTX 4090 system.
+> These are historical development benchmarks, not guaranteed gameplay performance.
 >
-> Actual performance depends on CPU, GPU, resolution, graphics settings, and scene complexity. Improvements observed on this system are not guaranteed across all hardware configurations.
+> Results above 180 FPS were obtained using internal benchmark configurations.
+>
+> The current v0.3.1 development build enforces a maximum gameplay frame rate of 180 FPS.
 
-### Rendering Architecture
+</details>
 
-The runtime combines recompiled PS2 game code with increasingly optimized native rendering implementations.
+<details>
+<summary><strong>View Technical Rendering Architecture</strong></summary>
 
-Current improvements include:
+<br>
+
+Current native rendering and runtime improvements include:
 
 - Native rendering of eligible static world geometry.
 - Persistent GPU buffers for supported world meshes.
@@ -265,188 +466,113 @@ Current improvements include:
 - Native shader-based vehicle environment mapping.
 - Optimized character and vehicle skinning.
 - Faster mesh identification and visibility checks.
-- Reduced unnecessary PS2 Graphics Synthesizer processing.
+- Reduced PlayStation 2 Graphics Synthesizer overhead.
 - Improved synchronization between native and PS2-oriented rendering paths.
 
-The native rendering paths are only used where their behavior has been sufficiently validated. Other operations continue through compatible fallback paths where necessary.
+The native rendering paths are used where their behavior has been sufficiently validated.
 
-### Frame Pacing & Presentation
+Compatible fallback paths remain available for operations that require them.
 
-The presentation system has been reworked to reduce unnecessary GPU work.
+### Resource Management
 
-Previously, the rendering pipeline could accumulate multiple frames ahead of the display. Under heavy GPU load, this resulted in additional work for frames that were never presented.
-
-Version 0.3.0 introduces:
-
-- Reduced rendering queue depth.
-- Improved frame presentation synchronization.
-- Reduced wasted GPU processing.
-- More consistent high-refresh-rate behavior.
-- Improved accuracy between internal FPS reporting and actual frame presentation.
-
-These changes are especially relevant when using higher resolutions, high refresh rates, or demanding graphics settings.
-
-### Texture & Resource Management
-
-Additional improvements include:
-
-- Reference-based texture processing to reduce unnecessary memory copying.
+- Reference-based texture processing.
 - Redundant texture upload detection.
 - Improved palette reuse.
-- More efficient command submission.
 - Expanded GPU mesh caching.
 - Incremental cache eviction.
-- Asynchronous texture processing and cleanup.
+- Asynchronous texture processing.
+- Reusable command buffers.
 
-The GPU mesh cache now supports **64,000 entries**, compared with the previous 12,000-entry limit.
-
-### Streaming & Loading
-
-World streaming benefits from:
+### World Streaming
 
 - Persistent level decompression caching.
 - Additional texture worker threads.
 - Reduced main-thread resource creation.
 - Background cache cleanup.
-- Improved memory-card backup processing.
-- Reduced frame-time spikes during island transitions and district loading.
+- Improved loading behavior during island transitions.
 
-### CPU Compatibility
+</details>
 
-**LCS Recomp automatically detects supported CPU instruction sets during game preparation.**
+<details>
+<summary><strong>CPU Compatibility & Optimization</strong></summary>
 
-The launcher selects an appropriate build configuration:
+<br>
+
+The launcher automatically selects an appropriate build configuration during game preparation.
 
 - AVX2-optimized builds for compatible processors.
-- AVX-compatible builds for older processors without AVX2.
-- No manual CPU optimization selection required for normal installation.
+- AVX-compatible builds for older supported processors.
 
-This improves compatibility across different CPU generations while allowing modern systems to use more optimized instruction sets.
+No manual CPU optimization selection is normally required.
 
-Actual compatibility still depends on the complete CPU and operating system configuration.
+Actual compatibility depends on the complete CPU and operating system configuration.
 
----
-
-## <a id="features"></a>Features
-
-The following features are available in the current public beta. Some remain experimental or may require further compatibility testing.
-
-| Graphics & Display | Performance & Gameplay |
-| :--- | :--- |
-| DirectX 11 rendering | Playable open-world gameplay |
-| Original PS2 rendering resolution | Playable missions and original cutscenes |
-| 1080p, 1440p, and 4K options | 30, 60, 120, 144 and 180 FPS |
-| Widescreen support | Uncapped mode with a default 180 FPS safety limit |
-| MSAA up to 8× | Improved high-FPS gameplay timing |
-| SMAA, SMAA 2X, SMAA 4X | Optimized native rendering paths |
-| Anisotropic filtering up to 16× | Improved frame pacing |
-| Original trails and glow effects | Improved world streaming |
-| HDR output — Stage 1 | Expanded 64 MB game memory configuration |
-| Configurable vehicle reflections | Local savegames and backups |
-
-| Controls & Input | PC Enhancements |
-| :--- | :--- |
-| Xbox controller support | PCSX2-compatible HD texture packs |
-| PlayStation controller support | Adjustable text scaling |
-| DualShock 3 pressure-sensitive controls | Additional graphics configuration |
-| Original DualShock 2/3 button prompts, when using a HD HUD Texture-Pack | Automatic monitor detection |
-| Adaptive controller prompts | Unified `lcs.ini` configuration |
-| Controller vibration | Local performance diagnostics |
-| Seamless input-device switching | Free Camera mode |
-| Native keyboard and mouse input | Toggleable HUD |
-| Free mouse-controlled vehicle camera | Mouse-wheel weapon switching |
-| Classic controller layout | Native audio and video playback |
-
-### Original DualShock 3 Pressure-Sensitive Controls
-
-Compatible DualShock 3 controllers support pressure-sensitive input for the original game controls.
-
-| Action | Function |
-| :--- | :--- |
-| Acceleration | Analog pressure-sensitive throttle |
-| Braking | Analog pressure-sensitive braking |
-| Steering | Pressure-sensitive directional-pad steering |
-
-Compatible drivers exposing analog button-pressure values are required.
-
-### Audio & Video
-
-The native audio and video systems support:
-
-- Original radio stations.
-- Original music and sound effects.
-- Ambient audio.
-- Dialogue and mission audio.
-- Cutscene audio.
-- Introductory movie playback.
-
-### Classic & Enhanced Gameplay
-
-The long-term vision is to allow players to choose how closely their experience resembles the original PlayStation 2 release.
-
-| Classic Experience | Enhanced PC Experience |
-| :--- | :--- |
-| Original PS2 visual identity | Higher rendering resolutions |
-| Original rendering resolution | Up to 4K |
-| Classic controller layout | Native keyboard and mouse |
-| Original 30 FPS timing | Higher frame rates |
-| Pressure-sensitive controls | Modern input options |
-| Original visual effects | SMAA, HDR, and additional settings |
-| Original camera behavior | Improved vehicle camera controls |
-| Original texture presentation | Optional HD texture replacements |
-| Original world presentation | Extended draw distance (planned) |
-
-These represent available options and long-term development goals, not two fully independent gameplay modes.
+</details>
 
 ---
 
-## <a id="installation"></a>Installation
+## <a id="screenshots"></a>Screenshots
 
-### First-Time Installation
+Experience Liberty City with its original visual identity and optional PC-focused enhancements.
 
-**New players should download the latest portable release.**
-
-1. Download [**LCS Recomp v0.3.0 Portable**](https://github.com/NicoWayne95/lcs-ps2-recomp/releases/download/v0.3.0/LCS-Recomp-Beta-0.3.0-portable.zip).
-2. Extract the ZIP archive into a writable folder.
-3. Follow the included `START-HERE.txt`.
-4. Start **LCS Recomp Launcher**.
-5. Open the **Installation** section.
-6. Select your original supported PlayStation 2 game ISO.
-7. Use **Check ISO** to validate the selected image.
-8. Select your preferred game installation directory if needed.
-9. Click **Prepare game**.
-10. Allow the launcher to download the required tools and prepare the native executable.
-11. Open **Home** and select **Play**.
-
-No manual compilation or programming knowledge is required for normal installation.
-
-The original ISO remains on your computer. The launcher prepares the game locally.
-
-### Updating an Existing Installation
-
-> [!TIP]
-> **Already have LCS Recomp installed?**
+> [!NOTE]
+> The latest screenshots were captured with an optional **HD HUD texture pack** enabled.
 >
-> You normally do not need to download the launcher again for compatible game updates.
-
-1. Open the existing LCS Recomp Launcher.
-2. Check for the latest available game update.
-3. Install v0.3.0 if it is offered.
-4. Allow the launcher to complete download, verification, and preparation.
-5. Start the game normally.
-
-Launcher upgrades are separate from game updates and may occasionally be necessary.
-
-Backing up your savegames before major updates is recommended while the project remains in beta.
-
-### Supported Game Version
-
-> [!IMPORTANT]
-> You must provide your own legally obtained PlayStation 2 copy of Grand Theft Auto: Liberty City Stories in ISO format.
+> HD texture packs are not included with LCS Recomp.
 >
-> **Supported version: USA / NTSC-U (SLUS-21423).**
->
-> Other regional releases and the PSP version are not currently supported.
+> Some screenshots represent internal development builds.
+
+### PC Features & Settings
+
+<p align="center">
+  <a href="docs/updates/v0.3.1/screenshots/menu-controller-setup.png">
+    <img src="docs/updates/v0.3.1/screenshots/menu-controller-setup.png" width="32%" alt="Controller Configuration">
+  </a>
+  <a href="docs/updates/v0.3.1/screenshots/menu-screen-settings.png">
+    <img src="docs/updates/v0.3.1/screenshots/menu-screen-settings.png" width="32%" alt="Screen Settings">
+  </a>
+  <a href="docs/updates/v0.3.1/screenshots/menu-graphics-settings.png">
+    <img src="docs/updates/v0.3.1/screenshots/menu-graphics-settings.png" width="32%" alt="Graphics Settings">
+  </a>
+</p>
+
+<p align="center">
+  <sub>Controller configuration · Screen settings · Graphics settings</sub>
+</p>
+
+<p align="center">
+  <a href="docs/FEATURES.md">
+    <img src="https://img.shields.io/badge/View-PC%20Feature%20Showcase-2878c7?style=for-the-badge" alt="View PC Feature Showcase">
+  </a>
+</p>
+
+### Gameplay Screenshots
+
+<p align="center">
+  <a href="docs/updates/v0.3.1/screenshots/beta-police-car-side.png">
+    <img src="docs/updates/v0.3.1/screenshots/beta-police-car-side.png" width="32%" alt="Optional Blue Beta LCPD Police Car">
+  </a>
+  <a href="docs/screenshots/sunset-railway.webp">
+    <img src="docs/screenshots/sunset-railway.webp" width="32%" alt="Liberty City Railway at Sunset">
+  </a>
+  <a href="docs/screenshots/downtown-street.webp">
+    <img src="docs/screenshots/downtown-street.webp" width="32%" alt="Downtown Liberty City">
+  </a>
+</p>
+
+<p align="center">
+  <sub>Beta police car appearance · Liberty City sunset · Downtown streets</sub>
+</p>
+
+<p align="center">
+  <a href="docs/GALLERY.md">
+    <img src="https://img.shields.io/badge/View-Full%20Screenshot%20Gallery-2878c7?style=for-the-badge" alt="View Full Screenshot Gallery">
+  </a>
+</p>
+
+---
+
+## <a id="installation"></a>Getting Started
 
 ### System Requirements
 
@@ -458,373 +584,414 @@ Backing up your savegames before major updates is recommended while the project 
 | CPU Optimization | Automatic AVX / AVX2 selection |
 | Game Version | PlayStation 2 — USA / NTSC-U |
 | Game ID | SLUS-21423 |
-| Game Format | Original supported ISO |
-| Internet Connection | Required for initial preparation and updates |
+| Required Game Files | Original supported ISO |
 | Launcher Runtime | Microsoft Edge WebView2 |
+| Internet Connection | Required for initial preparation and updates |
 
-Definitive minimum and recommended CPU, GPU, and RAM specifications have not yet been established through broad hardware testing.
+Definitive minimum and recommended CPU, GPU and RAM specifications have not yet been established through broad hardware testing.
 
-### Recommended Settings
+> [!IMPORTANT]
+> Only the supported USA / NTSC-U PlayStation 2 version is currently supported.
+>
+> Other regional versions and the PSP release are not supported.
 
-| Setting | Recommendation |
-| :--- | :--- |
-| Frame Rate | 60 FPS for a conservative gameplay baseline |
-| Input Device | Controller |
-| Controller Layout | Classic |
-| Resolution | Native monitor resolution, adjusted to available performance |
-| Anti-Aliasing | SMAA as an alternative to expensive MSAA settings |
-| HD Textures | Optional, depending on available memory and performance |
-| HDR | Optional on supported displays |
+### Quick Installation
 
-Higher frame rates remain experimental in some gameplay scenarios.
+1. Download the latest portable release.
+2. Extract the archive into a writable folder.
+3. Follow the included `START-HERE.txt`.
+4. Start the LCS Recomp Launcher.
+5. Open the Installation section.
+6. Select and validate your original supported PS2 ISO.
+7. Choose your installation directory.
+8. Select **Prepare game**.
+9. After preparation is complete, open Home and select **Play**.
 
-### Microsoft Edge WebView2
-
-The launcher requires Microsoft Edge WebView2 Runtime.
-
-Most current Windows installations already include it. If the launcher fails to start or displays an empty window, the runtime may need to be installed.
-
-[Download Microsoft Edge WebView2 Runtime](https://developer.microsoft.com/microsoft-edge/webview2/)
-
-### Windows SmartScreen
-
-The launcher and distributed executables are not currently Windows code-signed.
-
-Windows SmartScreen may display an unknown publisher warning.
-
-Only download LCS Recomp from the official repository and verify downloaded files before execution.
-
----
-
-## <a id="known-issues"></a>Known Issues
-
-LCS Recomp remains under active development. The following limitations are known in the current public beta.
-
-| Issue | Current Status |
-| :--- | :--- |
-| **Extended World Draw Distance** | Not fully implemented; original streaming and LOD systems still impose limitations |
-| **Blue Beta Police Cars** | Optional recoloring requires further material-handling work |
-| **Native Mouse Free Aim** | Additional development required |
-| **Vehicle Camera** | Certain angles and recentering scenarios may still require refinement |
-| **HD Texture Packs** | Region-suffixed replacements and custom mipmap levels are not yet supported |
-| **Pixel Fonts** | Some HUD and menu elements retain original pixel fonts when replacement packs do not cover them |
-| **Particle Rotation** | Some effects still contain frame-dependent rotational behavior |
-| **HDR** | HUD brightness is affected by the current HDR implementation; launcher and pause menu HDR remain incomplete |
-| **High-FPS Gameplay** | Not every mission, animation, or cutscene has been validated at elevated frame rates |
-| **Hardware Compatibility** | Additional testing on older and lower-end systems is needed |
-| **Long-Session Stability** | Further gameplay and compatibility validation remains ongoing |
-
-### Draw Distance & World Streaming
-
-The current Draw Distance setting primarily adjusts supported object detail distances.
-
-A complete increase in world geometry draw distance requires additional changes to:
-
-- World streaming ranges.
-- Object loading and unloading.
-- LOD selection and transitions.
-- Visibility and culling.
-- Streaming memory management.
-- Rendering performance.
-
-The goal is to provide optional extended draw distance while preserving original PS2 behavior by default.
-
-### HDR Limitations
-
-The initial HDR implementation supports HDR output and configurable image controls, but further UI-specific work is necessary.
-
-In particular, HUD brightness, pause-menu presentation, and launcher HDR integration require additional improvements.
-
-### High-FPS Limitations
-
-Although many timing issues have been corrected, some systems may still depend on the original PS2 timing model.
-
-Not every mission, cutscene, animation, and particle effect has been individually validated above 30 FPS.
-
-**Recommended baseline:** 60 FPS with a controller using Classic controls.
-
-[**Report a Bug or View Current Issues**](https://github.com/NicoWayne95/lcs-ps2-recomp/issues)
-
----
-
-## <a id="roadmap"></a>Roadmap
+No manual compilation or programming knowledge is required for normal installation.
 
 <p align="center">
-  <img src="docs/features/roadmap-banner.png" alt="LCS Recomp Roadmap" width="100%">
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">
+    <img src="https://img.shields.io/badge/Download-LCS%20Recomp-238636?style=for-the-badge&logo=github" alt="Download LCS Recomp">
+  </a>
 </p>
 
-Development continues to focus on performance, stability, compatibility, and gradually replacing unnecessary PS2-specific processing with more efficient native PC implementations.
-
-The following items represent development goals rather than confirmed release commitments.
-
-### Rendering & Graphics
-
-- Further improve native rendering accuracy.
-- Reduce remaining PS2 Graphics Synthesizer overhead.
-- Improve synchronization between native and PS2-oriented rendering paths.
-- Continue developing world streaming and LOD handling.
-- Implement functional extended world draw distance.
-- Improve HDR presentation and UI brightness handling.
-- Expand HD texture replacement compatibility.
-- Restore optional blue beta police vehicles.
-
-### Performance & Compatibility
-
-- Continue reducing CPU-side rendering overhead.
-- Improve performance on older and lower-end hardware.
-- Further optimize the Render Worker and GS processing stages.
-- Reduce memory transfers and synchronization costs.
-- Improve frame-time consistency.
-- Expand performance profiling and diagnostics.
-- Improve long-session stability.
-- Continue testing CPU compatibility across different generations.
-
-### Gameplay & Controls
-
-- Complete native mouse free aim.
-- Further refine vehicle camera behavior.
-- Implement customizable keyboard bindings.
-- Improve motorcycle handling.
-- Expand controller compatibility.
-- Complete high-FPS timing corrections.
-- Expand mission and cutscene compatibility testing.
-
-### In-Game Trainer & Function Key System
-
-A more structured in-game interface is planned to separate gameplay features from graphics settings and development tools.
-
 <details>
-<summary><b>View Planned F1–F12 Layout</b></summary>
+<summary><strong>Updating an Existing Installation</strong></summary>
 
-| Key | Planned Function | Description |
-| :--- | :--- | :--- |
-| `F1` | Help & Shortcuts | Controls and keyboard shortcuts |
-| `F2` | Video & HUD | Graphics, resolution, effects, and HUD settings |
-| `F3` | Trainer | Player, weapons, vehicles, world, and original cheats |
-| `F4` | Performance | FPS, frame times, and profiling |
-| `F5` | Resolution | Cycle through rendering resolutions |
-| `F6` | FPS Mode | Cycle through frame-rate limits |
-| `F7` | Trails | Toggle original PS2 trails |
-| `F8` | Free Camera | Toggle free camera |
-| `F9` | HUD | Show or hide the HUD |
-| `F10` | Developer Diagnostics | Debugging and world inspection |
-| `F11` | Fullscreen | Toggle fullscreen |
-| `F12` | Screenshot | Capture gameplay screenshots |
+<br>
 
-This table describes the planned layout, not a guarantee that every shortcut currently behaves as shown.
+1. Open the existing LCS Recomp Launcher.
+2. Check for available updates.
+3. Install the latest compatible game update.
+4. Allow download, verification and preparation to complete.
+5. Start the game normally.
+
+Launcher updates and game updates are separate.
+
+Backing up savegames before major updates is recommended.
 
 </details>
 
-### Launcher Development
+<details>
+<summary><strong>Recommended Gameplay Settings</strong></summary>
 
-Further launcher improvements are planned, including:
+<br>
 
-- More modern and consistent interface design.
-- Improved installation and preparation workflows.
-- Better dependency management.
-- Clearer download and compilation progress.
-- Improved error reporting and recovery options.
-- More reliable updates.
-- Better separation between launcher and game runtime.
+| Setting | Recommendation |
+| :--- | :--- |
+| Frame Rate | 60 FPS as a conservative baseline |
+| Input Device | Controller |
+| Controller Layout | Classic |
+| Resolution | Adjust according to available performance |
+| Anti-Aliasing | SMAA |
+| Texture Filtering | Adjust according to GPU performance |
+| HD Textures | Optional |
+| HDR | Optional on compatible displays |
 
-### Long-Term Development
+Higher frame rates remain experimental in some gameplay scenarios.
 
-- Cleaner and more accessible public source code.
-- Reproducible build processes.
-- Expanded technical documentation.
-- Community contributions and pull requests.
-- More configurable Classic and Enhanced PC experiences.
-- Investigation of modding and mod-loader support.
-- Potential additional platform support, subject to feasibility.
+</details>
 
-No specific release dates are promised for individual roadmap items.
+<details>
+<summary><strong>Troubleshooting & Launcher Requirements</strong></summary>
 
----
+<br>
 
-## <a id="screenshots"></a>Screenshots
+### Microsoft Edge WebView2
 
-### PC Features & Settings
+The current launcher requires Microsoft Edge WebView2 Runtime.
 
-The screenshots below showcase the PC interface, controller configuration, and additional graphics options.
+If the launcher fails to start or displays an empty window, the runtime may need to be installed.
 
-Some screenshots may represent earlier development versions.
+[Download Microsoft Edge WebView2](https://developer.microsoft.com/microsoft-edge/webview2/)
 
-<p align="center">
-  <a href="docs/features/controls-overview.webp">
-    <img src="docs/features/controls-overview.webp" width="32%" alt="LCS Recomp controls overview">
-  </a>
-  <a href="docs/features/mouse-keyboard-setup.webp">
-    <img src="docs/features/mouse-keyboard-setup.webp" width="32%" alt="Mouse and keyboard settings">
-  </a>
-  <a href="docs/features/display-settings.webp">
-    <img src="docs/features/display-settings.webp" width="32%" alt="Graphics and display settings">
-  </a>
-</p>
+### Windows SmartScreen
 
-<p align="center">
-  <a href="docs/FEATURES.md"><strong>View All PC Feature Screenshots</strong></a>
-</p>
+The distributed executables are not currently Windows code-signed.
 
-### Gameplay Screenshots
+Windows may display an unknown publisher warning.
 
-<p align="center">
-  <a href="docs/screenshots/lcpd-helicopter.webp">
-    <img src="docs/screenshots/lcpd-helicopter.webp" width="32%" alt="Police helicopter above Liberty City">
-  </a>
-  <a href="docs/screenshots/sunset-railway.webp">
-    <img src="docs/screenshots/sunset-railway.webp" width="32%" alt="Liberty City railway at sunset">
-  </a>
-  <a href="docs/screenshots/downtown-street.webp">
-    <img src="docs/screenshots/downtown-street.webp" width="32%" alt="Downtown Liberty City">
-  </a>
-</p>
+Only download LCS Recomp from the official repository and verify downloaded files before execution.
 
-<p align="center">
-  <a href="docs/GALLERY.md"><strong>View the Full Screenshot Gallery</strong></a>
-</p>
+</details>
 
 ---
 
-## Community & Feedback
+## Known Issues & Limitations
+
+LCS Recomp remains under active development.
+
+| Area | Current Limitation |
+| :--- | :--- |
+| Mouse Aiming | Crosshair and projectile accuracy require further improvements |
+| World Draw Distance | Original streaming and LOD limitations remain |
+| High-FPS Gameplay | Further mission, animation and physics validation required |
+| HDR | Additional UI brightness and presentation work required |
+| Memory Management | Further optimization planned |
+| Hardware Compatibility | Additional testing on older hardware required |
+| HD Texture Packs | Compatibility may vary between replacement packs |
+| Stability | Long-session and mission compatibility testing remains ongoing |
+
+For individual bugs and current investigations, refer to the GitHub issue tracker.
+
+<p align="center">
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/issues">
+    <img src="https://img.shields.io/badge/View-Known%20Issues-E97132?style=for-the-badge&logo=github" alt="Known Issues">
+  </a>
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/issues/new/choose">
+    <img src="https://img.shields.io/badge/Report-a%20Bug-555555?style=for-the-badge&logo=github" alt="Report a Bug">
+  </a>
+</p>
+
+---
+
+## <a id="roadmap"></a>Development Roadmap
+
+<p align="center">
+  <img src="docs/features/roadmap-banner.png" width="100%" alt="LCS Recomp Development Roadmap">
+</p>
+
+Development focuses on performance, stability, compatibility and optional PC enhancements while preserving the original gameplay experience.
+
+### Active Development Priorities
+
+| Development Area | Status |
+| :--- | :--- |
+| Native rendering optimization | Ongoing |
+| CPU and GPU efficiency | Ongoing |
+| Performance on older hardware | Ongoing |
+| Stability and compatibility testing | Ongoing |
+| PC settings and menu improvements | Development build |
+| Mouse aiming accuracy | Investigating |
+| Memory usage optimization | Planned |
+
+### Upcoming Development Goals
+
+| Feature | Development Goal |
+| :--- | :--- |
+| Launcher Redesign | New architecture and improved usability |
+| Faster Game Preparation | Reduced compilation and installation times |
+| Extended Draw Distance | Improved streaming and LOD handling |
+| Controller Support | Additional compatibility and refinements |
+| Gameplay Timing | Further high-FPS compatibility improvements |
+| HD Texture Support | Expanded replacement compatibility |
+| Developer Tools | Improved diagnostics and inspection tools |
+
+### Long-Term Goals
+
+| Feature | Development Goal |
+| :--- | :--- |
+| Native HDR Rendering | Fully native HDR rendering pipeline |
+| Cross-Platform Launcher | Linux and macOS launcher compatibility |
+| Additional Runtime Platforms | Investigation of native platform support |
+| Modding | Improved modding and asset inspection capabilities |
+| Trainer System | Optional in-game gameplay and developer tools |
+| Build Reproducibility | Cleaner and more accessible development workflows |
+
+<details>
+<summary><strong>Detailed Rendering & Graphics Roadmap</strong></summary>
+
+<br>
+
+- Improve native rendering accuracy.
+- Reduce remaining PS2 Graphics Synthesizer overhead.
+- Improve synchronization between native and fallback rendering paths.
+- Optimize world geometry processing.
+- Improve vehicle reflection accuracy and efficiency.
+- Develop functional extended world draw distance.
+- Improve HDR presentation and UI brightness.
+- Investigate native HDR rendering.
+- Expand texture replacement compatibility.
+
+</details>
+
+<details>
+<summary><strong>Detailed Performance & Compatibility Roadmap</strong></summary>
+
+<br>
+
+- Reduce CPU-side rendering overhead.
+- Optimize render worker and GS processing stages.
+- Reduce unnecessary memory transfers.
+- Improve memory allocation and resource lifetime management.
+- Improve performance on older CPUs and GPUs.
+- Improve frame-time consistency.
+- Expand profiling and diagnostics.
+- Improve long-session stability.
+- Expand mission and hardware compatibility testing.
+
+</details>
+
+<details>
+<summary><strong>Detailed Launcher Roadmap</strong></summary>
+
+<br>
+
+A new launcher architecture is planned.
+
+Development goals include:
+
+- Redesigned user interface.
+- Improved installation workflows.
+- Faster game preparation.
+- More efficient compilation.
+- Improved dependency management.
+- Clearer download and build progress.
+- Improved error reporting.
+- Improved recovery options.
+- Better update management.
+- Linux and macOS launcher compatibility.
+
+Cross-platform launcher support does not automatically provide native game runtime support on those platforms.
+
+</details>
+
+> [!NOTE]
+> Roadmap items represent development goals, not confirmed release commitments.
+>
+> No specific release dates are promised for individual features.
+
+---
+
+## <a id="documentation"></a>Documentation & Resources
+
+<table>
+  <tr>
+    <td width="50%">
+      <h3><a href="docs/FEATURES.md">PC Feature Showcase</a></h3>
+      Expanded menus, controls, graphics settings, HDR, interface options and extras.
+    </td>
+    <td width="50%">
+      <h3><a href="docs/GALLERY.md">Screenshot Gallery</a></h3>
+      Explore gameplay screenshots, vehicles and the atmosphere of Liberty City.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3><a href="docs/updates/README.md">Update History</a></h3>
+      Previous releases, development showcases and individual version documentation.
+    </td>
+    <td width="50%">
+      <h3><a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases">Public Releases</a></h3>
+      Available downloads, release notes and distributed builds.
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3><a href="https://github.com/NicoWayne95/lcs-ps2-recomp/issues">Issue Tracker</a></h3>
+      Known bugs, compatibility reports and feature requests.
+    </td>
+    <td width="50%">
+      <h3><a href="https://github.com/NicoWayne95/lcs-ps2-recomp/discussions">Community Discussions</a></h3>
+      Development discussions, feedback and community testing.
+    </td>
+  </tr>
+</table>
+
+---
+
+## <a id="community"></a>Community & Feedback
 
 Community testing is one of the most valuable ways to improve LCS Recomp.
 
-I'm particularly interested in **real-world performance results**, especially on older or mid-range CPUs and GPUs.
+I'm particularly interested in real-world performance results on older and mid-range hardware.
 
-If you're testing the latest version, please consider sharing:
+### Help Improve LCS Recomp
+
+- Report reproducible bugs.
+- Share performance results.
+- Test different hardware configurations.
+- Report mission and cutscene issues.
+- Provide controller compatibility feedback.
+- Share screenshots and recordings.
+- Suggest technical improvements.
+
+<details>
+<summary><strong>Recommended Performance Report Format</strong></summary>
+
+<br>
 
 | Information | Example |
 | :--- | :--- |
+| Game Version | v0.3.0 |
 | CPU | AMD Ryzen 5 5600X |
 | GPU | NVIDIA RTX 3060 |
 | RAM | 16 GB |
 | Windows Version | Windows 11 |
-| Resolution | 1920×1080 |
-| FPS Mode | 60 / 120 / 144 / Uncapped |
-| Anti-Aliasing | SMAA / MSAA |
+| Resolution | 1920 × 1080 |
+| Internal Resolution | 100% |
+| FPS Target | 60 FPS |
+| Anti-Aliasing | SMAA |
+| HD Textures | Disabled |
+| HDR | Disabled |
 | Average FPS | 65 FPS |
 | 1% Low | 42 FPS |
+| RAM / VRAM Usage | Measured values |
 | Test Location | Portland Police Station |
-| Issue | Frame drops while driving through traffic |
+| Issue | Frame drops in heavy traffic |
 
-Useful reports include:
+Comparisons between releases are especially helpful when using identical graphics settings and test locations.
 
-- Average FPS and frame-time consistency.
-- CPU and GPU utilization.
-- Performance in densely populated areas.
-- Stuttering during island transitions.
-- Controller compatibility.
-- Rendering artifacts.
-- Mission and cutscene issues.
-- Savegame behavior.
-- Long-session stability.
-
-Comparisons with previous versions are particularly helpful when the same location and graphics settings are used.
-
-Screenshots, videos, performance captures, and reproducible steps make technical investigations significantly easier.
+</details>
 
 <p align="center">
   <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/discussions">
-    <img src="https://img.shields.io/badge/Community-Discussions-2878c7?style=for-the-badge&logo=github" alt="GitHub Discussions">
+    <img src="https://img.shields.io/badge/Community-Discussions-2878c7?style=for-the-badge&logo=github" alt="Community Discussions">
   </a>
   <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/issues">
     <img src="https://img.shields.io/badge/Feedback-Report%20an%20Issue-555555?style=for-the-badge&logo=github" alt="Report an Issue">
   </a>
 </p>
 
-Constructive feedback, technical suggestions, and future contributions are always welcome.
-
 ---
 
-## <a id="source-code"></a>Source Code & Development
+## Source Code & Development
 
 LCS Recomp builds upon existing open-source recompilation projects and includes custom runtime modifications and native PC implementations.
 
-The public releases provide the game preparation resources and source kit needed by the distribution workflow.
+Development priorities include:
 
-The complete reorganized development repository is still being prepared.
-
-### Development Priorities
-
-- Better separation between game runtime and launcher.
-- Reproducible build processes.
-- Cleaner organization of source code and dependencies.
-- Improved build documentation.
+- Reproducible builds.
+- Cleaner source code organization.
+- Improved technical documentation.
 - Expanded automated testing.
-- More detailed profiling and benchmarking.
-- Consistent third-party attribution and licensing.
-- Removal of machine-specific paths and unrelated local files.
-- Separation of copyrighted original game data from distributable code.
+- Performance profiling.
+- Consistent third-party attribution.
+- Separation of copyrighted game data from distributable code.
 
-### Open-Source Development
+The project remains a personal hobby and learning project.
 
-The long-term goal is to make the project easier for other developers to inspect, build, test, and contribute to.
+<details>
+<summary><strong>AI-Assisted Development</strong></summary>
 
-The public source code must remain consistent with the applicable licensing requirements of incorporated third-party projects.
+<br>
 
-Preparing the reorganized repository does not remove existing source distribution obligations associated with GPL-covered components.
+LCS Recomp is developed with assistance from AI tools, including Claude and locally running language models.
 
-No original game ISOs or copyrighted Rockstar assets are intended to be distributed.
+These tools assist with research, code exploration, reverse engineering, implementation, debugging, profiling and testing.
 
----
+AI-generated code is not automatically considered correct or production-ready.
 
-## AI-Assisted Development
+Changes require technical review, integration and practical validation.
 
-LCS Recomp is developed with assistance from AI tools, including Claude and a locally running Qwen model.
+Project direction, development decisions, testing and release responsibility remain mine.
 
-These tools assist with research, code exploration, implementation, debugging, profiling, and testing.
-
-AI-generated code is not automatically considered correct or production-ready. Changes require technical review, integration, and practical validation.
-
-Project direction, implementation decisions, testing, and release responsibility remain mine.
-
-This is a personal hobby and learning project, and AI-assisted development allows me to explore complex technical systems while continuously improving my understanding.
+</details>
 
 ---
 
-## Credits
+## <a id="credits"></a>Credits
 
-LCS Recomp builds upon the work of several open-source projects and their contributors.
+LCS Recomp builds upon the work of existing open-source projects and their contributors.
 
-Their work provides essential technical foundations for the project.
+| Project | Contribution | License |
+| :--- | :--- | :--- |
+| [PS2Recomp — ran-j](https://github.com/ran-j/PS2Recomp) | Static PS2 recompilation and foundational runtime | GPL-3.0 |
+| [GTA Vice City Stories Recomp — gothamor](https://github.com/gothamor/gta-vcs-recomp) | Technical Ideas | GPL-3.0 |
+| [HCTP Recomp — BigDaddyJRich](https://github.com/BigDaddyJRich/hctp-recomp) | VU1 recompilation foundation | GPL-3.0 |
+| [Kenney Input Prompts](https://kenney.nl/assets/input-prompts) | Controller, keyboard and mouse icon assets | CC0 1.0 |
+
+<details>
+<summary><strong>Detailed Third-Party Attribution</strong></summary>
+
+<br>
 
 ### PS2Recomp
 
-[**PS2Recomp by ran-j**](https://github.com/ran-j/PS2Recomp)
-
 Provides the static PlayStation 2 recompiler and foundational runtime used by LCS Recomp.
-
-License: GPL-3.0.
 
 ### GTA: Vice City Stories Recomp
 
-[**GTA: Vice City Stories Recomp by gothamor**](https://github.com/gothamor/gta-vcs-recomp)
+Serves as an important technical reference and foundation for LCS Recomp.
 
-Provides technical reference
+Parts of the runtime are derived from this project, including:
 
-License: GPL-3.0.
+- World rendering.
+- Native HLE world rendering paths.
+- Native audio playback.
+- Native movie playback.
+- Frame presentation.
+- Runtime improvements built on top of PS2Recomp.
 
 ### HCTP Recomp
 
-[**HCTP Recomp by BigDaddyJRich**](https://github.com/BigDaddyJRich/hctp-recomp)
-
 Provides the foundation for the VU1 recompiler used within LCS Recomp.
-
-License: GPL-3.0.
 
 ### Kenney
 
-[**Input Prompts by Kenney**](https://kenney.nl/assets/input-prompts)
+Provides controller, keyboard and mouse icon assets used by the adaptive input prompt system.
 
-Provides controller, keyboard, and mouse icon assets used by the adaptive input prompt system.
+### HD Texture Packs
 
-License: [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
+Some screenshots were captured using optional third-party HD HUD texture packs.
 
-### Third-Party Licenses
+These texture packs are not distributed with LCS Recomp and remain the work of their respective creators.
 
 All incorporated third-party components remain subject to their applicable licenses and copyright notices.
 
 Additional attribution and licensing information can be found in the `NOTICE.txt` and associated license files included with the distribution.
+
+</details>
 
 ---
 
@@ -832,15 +999,15 @@ Additional attribution and licensing information can be found in the `NOTICE.txt
 
 LCS Recomp is an unofficial, independent fan development project.
 
-It is not affiliated with, endorsed by, or sponsored by Rockstar Games, Rockstar Leeds, Rockstar North, Take-Two Interactive, Sony Interactive Entertainment, or Microsoft.
+It is not affiliated with, endorsed by or sponsored by Rockstar Games, Rockstar Leeds, Rockstar North, Take-Two Interactive, Sony Interactive Entertainment or Microsoft.
 
-Grand Theft Auto, Liberty City Stories, and all associated characters, trademarks, and copyrighted assets belong to their respective owners.
+Grand Theft Auto, Liberty City Stories and associated characters, trademarks and copyrighted assets belong to their respective owners.
 
 No ownership of the original game or its assets is claimed.
 
 The cover artwork displayed in this repository is unofficial concept artwork. Any age-rating-style symbol shown is not an official rating for this project.
 
-No original game ISOs or copyrighted Rockstar game assets are included with LCS Recomp.
+No original game ISOs or copyrighted Rockstar game assets are included in the distributed game packages.
 
 Users must provide their own legally obtained copy of the supported game.
 
@@ -851,7 +1018,16 @@ Users must provide their own legally obtained copy of the supported game.
 </p>
 
 <p align="center">
-  Developed in my free time, with the goal of preserving and enhancing the original experience.
+  Developed independently, in my spare time,<br>
+  with the goal of preserving and enhancing the original experience.
+</p>
+
+<p align="center">
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/releases/latest">Download</a> ·
+  <a href="docs/FEATURES.md">Features</a> ·
+  <a href="docs/GALLERY.md">Screenshots</a> ·
+  <a href="docs/updates/README.md">Updates</a> ·
+  <a href="https://github.com/NicoWayne95/lcs-ps2-recomp/discussions">Community</a>
 </p>
 
 <p align="center">
