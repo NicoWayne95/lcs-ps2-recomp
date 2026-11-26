@@ -220,7 +220,6 @@ The graphics configuration menu provides additional control over rendering quali
 
 LCS Recomp provides additional anti-aliasing options, including:
 
-- MSAA.
 - SMAA.
 - SMAA 2X.
 - SMAA 4X.
