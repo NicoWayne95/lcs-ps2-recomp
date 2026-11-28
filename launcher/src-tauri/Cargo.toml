@@ -1,0 +1,30 @@
+[package]
+name = "lcs-recomp-launcher"
+version = "0.2.0"
+description = "LCS Recomp Launcher"
+edition = "2021"
+publish = false
+
+[lib]
+name = "lcs_launcher_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha2 = "0.10"
+semver = "1"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "blocking"] }
+zip = { version = "2", default-features = false, features = ["deflate"] }
+ed25519-dalek = "2"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true

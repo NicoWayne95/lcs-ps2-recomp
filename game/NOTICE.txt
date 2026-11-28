@@ -1,0 +1,41 @@
+LCS RECOMP
+
+A static recompilation of Grand Theft Auto: Liberty City Stories (PS2, USA, SLUS-21423) as a native Windows game.
+
+LCS Recomp contains no game files and no game code. The game's code is recompiled on your own PC from your own disc image. You need your own copy of the game.
+
+Grand Theft Auto and all game content are property of Rockstar Games / Take-Two Interactive. LCS Recomp is not affiliated with or endorsed by them.
+
+
+ORIGIN
+
+PS2Recomp (GPL-3.0)
+https://github.com/ran-j/PS2Recomp
+The recompiler and the PS2 runtime this project is built on.
+
+GTA: Vice City Stories native PC port (GPL-3.0)
+https://github.com/gothamor/gta-vcs-recomp
+Used as the reference for this project. Parts of the runtime are derived from it: the world renderer, the HLE world path, the native sound and movie players, the presenter and the runtime changes on top of PS2Recomp.
+
+hctp-recomp (GPL-3.0)
+The VU1 recompiler (tools/vu1_recomp.py) derives from it.
+
+
+LICENCE
+
+LCS Recomp is free software, licensed under the GNU General Public License, version 3 (GPL-3.0), like the projects it is based on. You may use, study, change and share it, including your own modified versions, under the terms of the GPL-3.0. If you pass it on, the same licence applies, the source code has to come with it, and this notice has to stay.
+
+The source code of LCS Recomp is included: the kit folder of the installation holds the runtime's sources, the recompiler and the build configuration. The full licence text is in LICENSE.txt; the licences of the third-party libraries are in the licenses folder.
+
+LCS Recomp comes without any warranty, as described in the GPL-3.0.
+
+The licence covers LCS Recomp's code only. It grants no rights to Grand Theft Auto: Liberty City Stories or any other game content.
+
+
+THIRD-PARTY LIBRARIES
+
+SDL3 (zlib) · Dear ImGui (MIT) · fmt (MIT) · toml11 (MIT) · ELFIO (MIT) · nlohmann/json (MIT) · rabbitizer (MIT) · libdwarf (LGPL-2.1) · zlib (zlib) · FFmpeg (LGPL-2.1, shared libraries)
+
+Launcher: Tauri (MIT / Apache-2.0) · Inter and Bebas Neue fonts (SIL Open Font License 1.1)
+
+Input prompt icons by Kenney (CC0). https://kenney.nl/assets/input-prompts
